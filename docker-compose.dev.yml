@@ -1,0 +1,27 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: deps
+    image: debugmate:dev
+    container_name: debugmate-dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env.local
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: debugmate-redis-dev
+    ports:
+      - "6379:6379"
+    restart: unless-stopped

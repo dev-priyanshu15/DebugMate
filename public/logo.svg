@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1a0a1e"/>
+      <stop offset="100%" stop-color="#0a0a1a"/>
+    </linearGradient>
+    <linearGradient id="bugGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff4d6d"/>
+      <stop offset="100%" stop-color="#00d4ff"/>
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff4d6d" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#00d4ff" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="48" height="48" rx="12" fill="url(#bgGrad)"/>
+
+  <!-- Subtle glow layer -->
+  <rect width="48" height="48" rx="12" fill="url(#glowGrad)" opacity="0.4"/>
+
+  <!-- Bug body - main oval -->
+  <ellipse cx="24" cy="25" rx="8" ry="10" fill="url(#bugGrad)" opacity="0.95"/>
+
+  <!-- Bug head -->
+  <circle cx="24" cy="14" r="4.5" fill="url(#bugGrad)" opacity="0.95"/>
+
+  <!-- Antenna left -->
+  <line x1="21.5" y1="11" x2="17" y2="7" stroke="url(#bugGrad)" stroke-width="1.8" stroke-linecap="round"/>
+  <circle cx="16.5" cy="6.5" r="1.2" fill="#ff4d6d"/>
+
+  <!-- Antenna right -->
+  <line x1="26.5" y1="11" x2="31" y2="7" stroke="url(#bugGrad)" stroke-width="1.8" stroke-linecap="round"/>
+  <circle cx="31.5" cy="6.5" r="1.2" fill="#00d4ff"/>
+
+  <!-- Left legs -->
+  <line x1="16" y1="21" x2="10" y2="19" stroke="url(#bugGrad)" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="16" y1="25" x2="10" y2="25" stroke="url(#bugGrad)" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="16" y1="29" x2="10" y2="31" stroke="url(#bugGrad)" stroke-width="1.6" stroke-linecap="round"/>
+
+  <!-- Right legs -->
+  <line x1="32" y1="21" x2="38" y2="19" stroke="url(#bugGrad)" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="32" y1="25" x2="38" y2="25" stroke="url(#bugGrad)" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="32" y1="29" x2="38" y2="31" stroke="url(#bugGrad)" stroke-width="1.6" stroke-linecap="round"/>
+
+  <!-- Wing divider line -->
+  <line x1="24" y1="16" x2="24" y2="35" stroke="#0a0a1a" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Eyes -->
+  <circle cx="21.5" cy="13.5" r="1.2" fill="white" opacity="0.9"/>
+  <circle cx="26.5" cy="13.5" r="1.2" fill="white" opacity="0.9"/>
+
+  <!-- Code bracket overlay - subtle -->
+  <text x="19" y="28" font-family="monospace" font-size="7" font-weight="bold" fill="white" opacity="0.25">{}</text>
+</svg>
