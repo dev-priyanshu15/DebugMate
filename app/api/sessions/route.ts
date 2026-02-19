@@ -23,7 +23,8 @@ export async function GET(request: NextRequest) {
             .single()
 
         if (!user) {
-            return Response.json({ error: 'User not found', code: 'USER_NOT_FOUND', retryable: false, retryAfter: null }, { status: 404 })
+            // User not in DB yet — return empty list (user will be created on /api/user)
+            return Response.json({ data: [], total: 0, page, pageSize, hasMore: false })
         }
 
         const { data: sessions, error, count } = await supabase

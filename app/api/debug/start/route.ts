@@ -5,6 +5,9 @@ import { generateClarifyingQuestions } from '@/lib/anthropic'
 import { setSession } from '@/lib/session-store'
 import { randomUUID } from 'crypto'
 
+// Allow up to 60s — Groq AI can take 15-30s on first call
+export const maxDuration = 60
+
 async function safeCacheSet(key: string, value: unknown) {
     try {
         const { setCache } = await import('@/lib/redis')
