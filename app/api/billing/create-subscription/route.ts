@@ -1,12 +1,10 @@
 import { auth } from '@clerk/nextjs/server'
-
-export const dynamic = 'force-dynamic'
-
-export const dynamic = 'force-dynamic'
 import { NextRequest } from 'next/server'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
 import { subscriptionSchema } from '@/lib/validations'
 import { getRazorpay, RAZORPAY_PLAN_IDS } from '@/lib/razorpay'
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
     try {

@@ -1,10 +1,8 @@
 import { auth } from '@clerk/nextjs/server'
-
-export const dynamic = 'force-dynamic'
-
-export const dynamic = 'force-dynamic'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
 import { cancelSubscription } from '@/lib/razorpay'
+
+export const dynamic = 'force-dynamic'
 
 export async function POST() {
     try {

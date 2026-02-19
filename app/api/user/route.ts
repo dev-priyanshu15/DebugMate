@@ -1,12 +1,10 @@
 import { auth, currentUser } from '@clerk/nextjs/server'
-
-export const dynamic = 'force-dynamic'
-
-export const dynamic = 'force-dynamic'
 import { NextRequest } from 'next/server'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
 import { userUpdateSchema } from '@/lib/validations'
 import { getOrCreateUser } from '@/lib/get-or-create-user'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
     try {
