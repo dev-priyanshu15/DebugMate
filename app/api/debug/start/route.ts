@@ -2,23 +2,11 @@ import { auth } from '@clerk/nextjs/server'
 import { NextRequest } from 'next/server'
 import { debugInputSchema } from '@/lib/validations'
 import { generateClarifyingQuestions } from '@/lib/anthropic'
-import { setSession } from '@/lib/session-store'
+import { setCache } from '@/lib/redis'
 
 // Edge Runtime gives 30s on Vercel Hobby (vs 10s for Node.js)
 export const runtime = 'edge'
 export const maxDuration = 30
-
-async function safeCacheSet(key: string, value: unknown) {
-    try {
-        const { setCache } = await import('@/lib/redis')
-        await Promise.race([
-            setCache(key, value, 1800),
-            new Promise<void>((resolve) => setTimeout(resolve, 3000)),
-        ])
-    } catch {
-        // Redis unavailable — in-memory store is already set
-    }
-}
 
 export async function POST(request: NextRequest) {
     try {
@@ -61,11 +49,10 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // 4. Store session in memory + Redis
+        // 4. Store session in Redis only (in-memory doesn't work across Vercel serverless instances)
         const sessionId = crypto.randomUUID()
         const sessionData = { userId, language, code, errorMessage, questions, errorCategory }
-        setSession(`session:${sessionId}`, sessionData, 1800)
-        await safeCacheSet(`session:${sessionId}`, sessionData)
+        await setCache(`session:${sessionId}`, sessionData, 1800)
 
         return Response.json({ sessionId, questions, errorCategory })
 

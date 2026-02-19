@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server'
 import { answersSchema } from '@/lib/validations'
 import { generateDebugReport } from '@/lib/anthropic'
 import { sanitizeInput } from '@/lib/utils'
-import { getSession, deleteSession } from '@/lib/session-store'
+import { getCached, deleteCache } from '@/lib/redis'
 
 // Edge Runtime gives 30s on Vercel Hobby (vs 10s for Node.js)
 export const runtime = 'edge'
@@ -19,18 +19,9 @@ interface SessionData {
 }
 
 async function loadSession(sessionId: string): Promise<SessionData | null> {
-    // Try in-memory first (fastest)
-    const mem = getSession<SessionData>(`session:${sessionId}`)
-    if (mem) return mem
-
-    // Try Redis fallback
+    // Redis only — in-memory doesn't work across Vercel serverless instances
     try {
-        const { getCached } = await import('@/lib/redis')
-        const cached = await Promise.race([
-            getCached<SessionData>(`session:${sessionId}`),
-            new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000)),
-        ])
-        return cached
+        return await getCached<SessionData>(`session:${sessionId}`)
     } catch {
         return null
     }
@@ -94,8 +85,8 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // 6. Clean up session
-        deleteSession(`session:${sessionId}`)
+        // 6. Clean up session from Redis
+        await deleteCache(`session:${sessionId}`)
 
         return Response.json({ sessionId, report })
 
