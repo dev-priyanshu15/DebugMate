@@ -3,10 +3,10 @@ import { NextRequest } from 'next/server'
 import { debugInputSchema } from '@/lib/validations'
 import { generateClarifyingQuestions } from '@/lib/anthropic'
 import { setSession } from '@/lib/session-store'
-import { randomUUID } from 'crypto'
 
-// Allow up to 60s — Groq AI can take 15-30s on first call
-export const maxDuration = 60
+// Edge Runtime gives 30s on Vercel Hobby (vs 10s for Node.js)
+export const runtime = 'edge'
+export const maxDuration = 30
 
 async function safeCacheSet(key: string, value: unknown) {
     try {
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
         }
 
         // 4. Store session in memory + Redis
-        const sessionId = randomUUID()
+        const sessionId = crypto.randomUUID()
         const sessionData = { userId, language, code, errorMessage, questions, errorCategory }
         setSession(`session:${sessionId}`, sessionData, 1800)
         await safeCacheSet(`session:${sessionId}`, sessionData)

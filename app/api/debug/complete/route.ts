@@ -5,8 +5,9 @@ import { generateDebugReport } from '@/lib/anthropic'
 import { sanitizeInput } from '@/lib/utils'
 import { getSession, deleteSession } from '@/lib/session-store'
 
-// Allow up to 60s — Groq AI can take 15-30s for full debug report
-export const maxDuration = 60
+// Edge Runtime gives 30s on Vercel Hobby (vs 10s for Node.js)
+export const runtime = 'edge'
+export const maxDuration = 30
 
 interface SessionData {
     userId: string
