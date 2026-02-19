@@ -5,9 +5,8 @@ import { generateDebugReport } from '@/lib/anthropic'
 import { sanitizeInput } from '@/lib/utils'
 import { getCached, deleteCache } from '@/lib/redis'
 
-// Edge Runtime gives 30s on Vercel Hobby (vs 10s for Node.js)
-export const runtime = 'edge'
-export const maxDuration = 30
+// Edge functions have dep compatibility issues — use Node.js runtime
+export const maxDuration = 60
 
 interface SessionData {
     userId: string

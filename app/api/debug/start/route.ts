@@ -4,9 +4,8 @@ import { debugInputSchema } from '@/lib/validations'
 import { generateClarifyingQuestions } from '@/lib/anthropic'
 import { setCache } from '@/lib/redis'
 
-// Edge Runtime gives 30s on Vercel Hobby (vs 10s for Node.js)
-export const runtime = 'edge'
-export const maxDuration = 30
+// Edge functions have dep compatibility issues — use Node.js runtime
+export const maxDuration = 60
 
 export async function POST(request: NextRequest) {
     try {
