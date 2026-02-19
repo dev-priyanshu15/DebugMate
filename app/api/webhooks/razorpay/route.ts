@@ -1,4 +1,6 @@
 import { NextRequest } from 'next/server'
+
+export const dynamic = 'force-dynamic'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
 import { verifyRazorpayWebhookSignature } from '@/lib/razorpay'
 

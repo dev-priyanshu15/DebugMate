@@ -1,6 +1,8 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextRequest } from 'next/server'
 import { answersSchema } from '@/lib/validations'
+
+export const dynamic = 'force-dynamic'
 import { generateDebugReport } from '@/lib/anthropic'
 import { sanitizeInput } from '@/lib/utils'
 import { getCached, deleteCache } from '@/lib/redis'
@@ -8,6 +10,7 @@ import { getSupabaseServerClient } from '@/lib/supabase/server'
 
 // Edge functions have dep compatibility issues — use Node.js runtime
 export const maxDuration = 60
+export const dynamic = 'force-dynamic'
 
 interface SessionData {
     userId: string

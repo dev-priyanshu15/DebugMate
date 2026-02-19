@@ -1,11 +1,14 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextRequest } from 'next/server'
 import { debugInputSchema } from '@/lib/validations'
+
+export const dynamic = 'force-dynamic'
 import { generateClarifyingQuestions } from '@/lib/anthropic'
 import { setCache } from '@/lib/redis'
 
 // Edge functions have dep compatibility issues — use Node.js runtime
 export const maxDuration = 60
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
     try {

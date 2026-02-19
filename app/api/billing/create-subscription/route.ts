@@ -1,4 +1,8 @@
 import { auth } from '@clerk/nextjs/server'
+
+export const dynamic = 'force-dynamic'
+
+export const dynamic = 'force-dynamic'
 import { NextRequest } from 'next/server'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
 import { subscriptionSchema } from '@/lib/validations'
