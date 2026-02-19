@@ -24,26 +24,112 @@ interface DebugReportProps {
   onDebugAnother?: () => void
 }
 
+// Normalize escaped \n sequences into real newlines
+function normalizeCode(code: string): string {
+  return code
+    .replace(/\\n/g, '\n')
+    .replace(/\\t/g, '  ')
+    .trim()
+}
+
+// Lightweight tokenizer — returns JSX spans with syntax colors
+function tokenizeLine(line: string, idx: number) {
+  // Tokenize by regex in priority order
+  const tokens: { type: string; value: string }[] = []
+  let remaining = line
+
+  const patterns: [string, RegExp][] = [
+    ['comment',   /^\/\/.*|^\/\*[\s\S]*?\*\//],
+    ['string',    /^("[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*'|`[^`\\]*(?:\\.[^`\\]*)*`)/],
+    ['number',    /^\b\d+\.?\d*\b/],
+    ['keyword',   /^\b(const|let|var|function|return|if|else|for|while|do|class|new|this|import|export|default|from|async|await|try|catch|finally|throw|typeof|instanceof|in|of|null|undefined|true|false|void|switch|case|break|continue|extends|implements|interface|type|enum|static|public|private|protected)\b/],
+    ['builtin',   /^\b(console|Math|Object|Array|String|Number|Boolean|Promise|JSON|Error|Date|Map|Set|fetch|setTimeout|clearTimeout|require|module|process)\b/],
+    ['fn',        /^\b([a-zA-Z_$][\w$]*)(?=\s*\()/],
+    ['punct',     /^[{}()\[\]<>,;:=!&|.+\-*/%?^~]+/],
+    ['ident',     /^[a-zA-Z_$][\w$]*/],
+    ['space',     /^\s+/],
+    ['other',     /^./],
+  ]
+
+  while (remaining.length > 0) {
+    let matched = false
+    for (const [type, rx] of patterns) {
+      const m = remaining.match(rx)
+      if (m) {
+        tokens.push({ type, value: m[0] })
+        remaining = remaining.slice(m[0].length)
+        matched = true
+        break
+      }
+    }
+    if (!matched) break
+  }
+
+  const colorMap: Record<string, string> = {
+    keyword:  '#c792ea',
+    string:   '#c3e88d',
+    number:   '#f78c6c',
+    comment:  '#546e7a',
+    builtin:  '#82aaff',
+    fn:       '#82aaff',
+    punct:    '#89ddff',
+    ident:    '#eeffff',
+    space:    'inherit',
+    other:    '#eeffff',
+  }
+
+  return (
+    <span key={idx}>
+      {tokens.map((t, i) => (
+        <span key={i} style={{ color: colorMap[t.type] ?? 'inherit' }}>{t.value}</span>
+      ))}
+    </span>
+  )
+}
+
 function CodeBlock({ code }: { code: string }) {
   const [copied, setCopied] = useState(false)
+  const normalized = normalizeCode(code)
+  const lines = normalized.split('\n')
 
   const handleCopy = async () => {
-    await copyToClipboard(code)
+    await copyToClipboard(normalized)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
   return (
-    <div className="relative group">
-      <pre className="code-block text-sm overflow-x-auto">{code}</pre>
+    <div className="relative group rounded-lg overflow-hidden" style={{ background: '#0d1117', border: '1px solid var(--border)' }}>
+      {/* Line numbers + code */}
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse" style={{ fontFamily: "'DM Mono', 'Fira Code', monospace", fontSize: '0.8125rem', lineHeight: '1.65' }}>
+          <tbody>
+            {lines.map((line, i) => (
+              <tr key={i} className="hover:bg-white/5 transition-colors">
+                <td
+                  className="select-none text-right pr-4 pl-4 align-top"
+                  style={{ color: '#3d4f5c', minWidth: '2.5rem', userSelect: 'none', borderRight: '1px solid #1e2a35' }}
+                >
+                  {i + 1}
+                </td>
+                <td className="pl-4 pr-6 align-top whitespace-pre">
+                  {tokenizeLine(line, i)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {/* Copy button */}
       <button
         onClick={handleCopy}
-        className="absolute top-2 right-2 p-1.5 rounded bg-[var(--surface-2)] border border-[var(--border)] opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-2 right-2 p-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+        style={{ background: '#1e2a35', border: '1px solid #2d3f4e' }}
       >
         {copied ? (
           <Check className="w-3.5 h-3.5 text-[var(--accent-green)]" />
         ) : (
-          <Copy className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+          <Copy className="w-3.5 h-3.5" style={{ color: '#546e7a' }} />
         )}
       </button>
     </div>
@@ -98,7 +184,7 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="card p-6 border-l-4 border-l-[var(--accent-green)]"
+        className="card p-6 border-l-4 border-l-[var(--accent-green)] overflow-hidden"
       >
         <div className="flex items-center gap-2 mb-5">
           <CheckCircle className="w-5 h-5 text-[var(--accent-green)]" />
@@ -110,7 +196,7 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
               <div className="w-7 h-7 rounded-full bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-xs font-display text-[var(--accent-green)]">{step.step}</span>
               </div>
-              <div className="flex-1 space-y-2">
+              <div className="flex-1 min-w-0 space-y-2">
                 <p className="font-ui text-sm text-[var(--text-primary)]">{step.instruction}</p>
                 {step.code && <CodeBlock code={step.code} />}
                 <p className="text-xs text-[var(--text-muted)] italic">{step.explanation}</p>
@@ -125,7 +211,7 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="card p-6"
+        className="card p-6 overflow-hidden"
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">

@@ -323,7 +323,13 @@
     font-size: 0.8125rem;
     line-height: 1.6;
     overflow-x: auto;
+    overflow-y: visible;
+    white-space: pre;
+    word-break: normal;
+    word-wrap: normal;
     color: var(--text-primary);
+    display: block;
+    max-width: 100%;
   }
 
   .sidebar-item {
