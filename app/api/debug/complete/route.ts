@@ -4,6 +4,7 @@ import { answersSchema } from '@/lib/validations'
 import { generateDebugReport } from '@/lib/anthropic'
 import { sanitizeInput } from '@/lib/utils'
 import { getCached, deleteCache } from '@/lib/redis'
+import { getSupabaseServerClient } from '@/lib/supabase/server'
 
 // Edge functions have dep compatibility issues — use Node.js runtime
 export const maxDuration = 60
@@ -86,6 +87,35 @@ export async function POST(request: NextRequest) {
 
         // 6. Clean up session from Redis
         await deleteCache(`session:${sessionId}`)
+
+        // 7. Save to Supabase + increment sessions_used
+        try {
+            const supabase = getSupabaseServerClient()
+            const { data: dbUser } = await supabase
+                .from('users')
+                .select('id')
+                .eq('clerk_id', userId)
+                .single()
+
+            if (dbUser) {
+                // Save the completed session
+                await supabase.from('debug_sessions').insert({
+                    user_id: dbUser.id,
+                    language: session.language,
+                    code: session.code,
+                    error_message: session.errorMessage,
+                    clarifying_questions: session.questions,
+                    debug_report: report,
+                    status: 'complete',
+                })
+
+                // Increment sessions_used counter
+                await supabase.rpc('increment_sessions_used', { user_id: dbUser.id })
+            }
+        } catch (dbError) {
+            console.error('Failed to save session to DB:', dbError)
+            // Don't fail the request — report was generated successfully
+        }
 
         return Response.json({ sessionId, report })
 
