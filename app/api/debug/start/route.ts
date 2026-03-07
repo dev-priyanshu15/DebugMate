@@ -28,33 +28,15 @@ export async function POST(request: NextRequest) {
 
         const { code, errorMessage, language } = validation.data
 
-        // 3. Call Groq AI with 30s timeout
-        let questions: Array<{ id: string; question: string }>
-        let errorCategory: string
+        // 3. Generate clarifying questions (retries + fallback handled internally)
+        const result = await generateClarifyingQuestions(language, errorMessage, code)
 
-        try {
-            const result = await Promise.race([
-                generateClarifyingQuestions(language, errorMessage, code),
-                new Promise<never>((_, reject) =>
-                    setTimeout(() => reject(new Error('AI timeout')), 30000)
-                ),
-            ])
-            questions = result.questions
-            errorCategory = result.errorCategory
-        } catch (aiError) {
-            console.error('AI error in debug/start:', aiError)
-            return Response.json(
-                { error: 'AI service error. Please try again.', code: 'AI_UNAVAILABLE', retryable: true },
-                { status: 503 }
-            )
-        }
-
-        // 4. Store session in Redis only (in-memory doesn't work across Vercel serverless instances)
+        // 4. Store session (Redis + in-memory fallback)
         const sessionId = crypto.randomUUID()
-        const sessionData = { userId, language, code, errorMessage, questions, errorCategory }
+        const sessionData = { userId, language, code, errorMessage, questions: result.questions, errorCategory: result.errorCategory }
         await setCache(`session:${sessionId}`, sessionData, 1800)
 
-        return Response.json({ sessionId, questions, errorCategory })
+        return Response.json({ sessionId, questions: result.questions, errorCategory: result.errorCategory })
 
     } catch (error) {
         console.error('Debug start error:', error)

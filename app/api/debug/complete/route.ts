@@ -20,7 +20,7 @@ interface SessionData {
 }
 
 async function loadSession(sessionId: string): Promise<SessionData | null> {
-    // Redis only — in-memory doesn't work across Vercel serverless instances
+    // Redis + in-memory fallback (handled by getCached)
     try {
         return await getCached<SessionData>(`session:${sessionId}`)
     } catch {
@@ -73,24 +73,10 @@ export async function POST(request: NextRequest) {
             })
             .join('\n\n')
 
-        // 5. Call Groq AI with 30s timeout
-        let report
-        try {
-            report = await Promise.race([
-                generateDebugReport(session.language, session.errorMessage, session.code, answersFormatted),
-                new Promise<never>((_, reject) =>
-                    setTimeout(() => reject(new Error('AI timeout')), 30000)
-                ),
-            ])
-        } catch (aiError) {
-            console.error('AI error in debug/complete:', aiError)
-            return Response.json(
-                { error: 'AI service error. Please try again.', code: 'AI_UNAVAILABLE', retryable: true },
-                { status: 503 }
-            )
-        }
+        // 5. Generate debug report (retries + fallback handled internally)
+        const report = await generateDebugReport(session.language, session.errorMessage, session.code, answersFormatted)
 
-        // 6. Clean up session from Redis
+        // 6. Clean up session from cache
         await deleteCache(`session:${sessionId}`)
 
         // 7. Save to Supabase + increment sessions_used
