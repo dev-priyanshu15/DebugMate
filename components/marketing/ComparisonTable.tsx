@@ -20,13 +20,13 @@ const tools = [
 
 export function ComparisonTable() {
   return (
-    <section className="py-24 px-6">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-display text-4xl text-[var(--text-primary)] mb-4">
+    <section className="py-20 px-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-10">
+          <h2 className="text-display text-3xl text-[var(--text-primary)] mb-3">
             Why DebugMate?
           </h2>
-          <p className="text-[var(--text-secondary)]">
+          <p className="text-sm text-[var(--text-secondary)]">
             See how we compare to your current debugging tools
           </p>
         </div>
@@ -35,19 +35,19 @@ export function ComparisonTable() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[var(--border)]">
-                  <th className="text-left p-4 text-sm font-ui text-[var(--text-muted)] w-1/3">Feature</th>
+                <tr className="border-b border-[var(--border)] bg-[var(--surface)]" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+                  <th className="text-left p-3.5 text-[12px] font-medium text-[var(--text-muted)] w-1/3 uppercase tracking-wider">Feature</th>
                   {tools.map((tool) => (
                     <th
                       key={tool.name}
-                      className={`p-4 text-sm font-ui text-center ${
+                      className={`p-3.5 text-[12px] font-medium text-center uppercase tracking-wider ${
                         tool.highlight
-                          ? 'text-[var(--accent-red)] bg-[rgba(255,77,109,0.05)]'
+                          ? 'text-[var(--accent-red)] bg-[rgba(255,92,124,0.05)]'
                           : 'text-[var(--text-secondary)]'
                       }`}
                     >
                       {tool.highlight && (
-                        <span className="block text-xs badge-red mb-1 mx-auto w-fit">Best</span>
+                        <span className="block text-[10px] badge-red mb-1 mx-auto w-fit normal-case tracking-normal">Best</span>
                       )}
                       {tool.name}
                     </th>
@@ -56,17 +56,20 @@ export function ComparisonTable() {
               </thead>
               <tbody>
                 {features.map((feature, i) => (
-                  <tr key={feature} className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--surface-2)] transition-colors">
-                    <td className="p-4 text-sm text-[var(--text-secondary)]">{feature}</td>
+                  <tr
+                    key={feature}
+                    className="border-b border-[var(--border)] last:border-0 transition-colors duration-150 hover:bg-[var(--surface-2)]"
+                  >
+                    <td className="p-3.5 text-[13px] text-[var(--text-secondary)]">{feature}</td>
                     {tools.map((tool) => (
                       <td
                         key={tool.name}
-                        className={`p-4 text-center ${tool.highlight ? 'bg-[rgba(255,77,109,0.03)]' : ''}`}
+                        className={`p-3.5 text-center ${tool.highlight ? 'bg-[rgba(255,92,124,0.03)]' : ''}`}
                       >
                         {tool.values[i] ? (
                           <Check className="w-4 h-4 text-[var(--accent-green)] mx-auto" />
                         ) : (
-                          <X className="w-4 h-4 text-[var(--text-muted)] mx-auto" />
+                          <X className="w-4 h-4 text-[var(--text-muted)] opacity-40 mx-auto" />
                         )}
                       </td>
                     ))}

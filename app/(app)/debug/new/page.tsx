@@ -8,7 +8,7 @@ import { ClarifyingQuestions } from '@/components/debug/ClarifyingQuestions'
 import { DebugReport } from '@/components/debug/DebugReport'
 import { useDebugSession } from '@/hooks/useDebugSession'
 import { QuestionAnswer, SupportedLanguage } from '@/types'
-import { AlertCircle, CheckCircle, MessageCircle, Code2 } from 'lucide-react'
+import { AlertCircle, CheckCircle, MessageCircle, Code2, RefreshCw, AlertTriangle } from 'lucide-react'
 
 const steps = [
   { id: 'input', label: 'Input', icon: Code2, progress: 33 },
@@ -20,25 +20,91 @@ export default function NewDebugPage() {
   const router = useRouter()
   const {
     step, sessionId, language, code, errorMessage, questions, report,
-    isLoading, error,
+    isLoading, error, sessionError,
     setStep, setSessionId, setLanguage, setCode, setErrorMessage,
-    setQuestions, setReport, setLoading, setError, reset,
+    setQuestions, setReport, setLoading, setError, setSessionError, reset,
   } = useDebugSession()
 
   const [confettiFired, setConfettiFired] = useState(false)
+  const [isRecovering, setIsRecovering] = useState(false)
 
   const fireConfetti = useCallback(() => {
     import('canvas-confetti').then(m => {
-      m.default({ particleCount: 80, spread: 70, origin: { y: 0.6 }, colors: ['#ff4d6d', '#00d4ff', '#a8ff78'] })
+      m.default({ particleCount: 80, spread: 70, origin: { y: 0.6 }, colors: ['#FF5C7C', '#00d4ff', '#a8ff78'] })
     }).catch(() => {})
   }, [])
 
-  // Clear stale errors from previous sessions on mount
+  // Clear stale errors on mount
   useEffect(() => {
     setError(null)
-  }, [setError])
+    setSessionError(null)
+  }, [setError, setSessionError])
 
   const currentStep = steps.find(s => s.id === step) || steps[0]
+
+  // Auto-recover: re-submit code to get a new session, then re-submit answers
+  const handleSessionRecovery = async (pendingAnswers?: QuestionAnswer[]) => {
+    if (!code.trim() || !errorMessage.trim()) {
+      setError('Unable to recover session. Please start a new debug session.')
+      setSessionError(null)
+      setStep('input')
+      return
+    }
+
+    setIsRecovering(true)
+    setSessionError(null)
+    setError(null)
+
+    try {
+      // Step 1: Re-create the session
+      const startRes = await fetch('/api/debug/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, errorMessage, language }),
+      })
+
+      const startData = await startRes.json()
+
+      if (!startRes.ok) {
+        setError(startData.error || 'Failed to restore session')
+        setStep('input')
+        return
+      }
+
+      setSessionId(startData.sessionId)
+      setQuestions(startData.questions)
+
+      // Step 2: If we have pending answers, auto-submit them
+      if (pendingAnswers && pendingAnswers.length > 0) {
+        const completeRes = await fetch('/api/debug/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: startData.sessionId, answers: pendingAnswers }),
+        })
+
+        const completeData = await completeRes.json()
+
+        if (!completeRes.ok) {
+          // Recovery partially succeeded — user can re-answer questions
+          setStep('clarifying')
+          return
+        }
+
+        setReport(completeData.report)
+        setStep('complete')
+        fireConfetti()
+        return
+      }
+
+      // No pending answers, go back to clarifying step
+      setStep('clarifying')
+    } catch {
+      setError('Network error during recovery. Please try again.')
+      setStep('input')
+    } finally {
+      setIsRecovering(false)
+    }
+  }
 
   const handleAnalyze = async () => {
     if (!code.trim() || !errorMessage.trim()) {
@@ -48,6 +114,7 @@ export default function NewDebugPage() {
 
     setLoading(true)
     setError(null)
+    setSessionError(null)
 
     try {
       const res = await fetch('/api/debug/start', {
@@ -93,6 +160,14 @@ export default function NewDebugPage() {
       const data = await res.json()
 
       if (!res.ok) {
+        // Handle session expiry gracefully
+        if (data.code === 'SESSION_NOT_FOUND' && data.recoverable) {
+          setSessionError('expired')
+          setLoading(false)
+          // Auto-recover with the answers
+          handleSessionRecovery(answers)
+          return
+        }
         setError(data.error || 'Failed to generate report')
         return
       }
@@ -124,15 +199,15 @@ export default function NewDebugPage() {
             const isDone = steps.findIndex(x => x.id === step) > i
             return (
               <div key={s.id} className="flex items-center gap-2">
-                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-btn text-xs font-ui transition-all ${
-                  isActive ? 'bg-[rgba(255,77,109,0.1)] text-[var(--accent-red)] border border-[rgba(255,77,109,0.3)]' :
+                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] font-medium transition-all duration-200 ${
+                  isActive ? 'bg-[rgba(255,92,124,0.08)] text-[var(--accent-red)] border border-[rgba(255,92,124,0.2)]' :
                   isDone ? 'text-[var(--accent-green)]' : 'text-[var(--text-muted)]'
                 }`}>
                   <Icon className="w-3.5 h-3.5" />
                   {s.label}
                 </div>
                 {i < steps.length - 1 && (
-                  <div className={`h-px w-8 ${isDone ? 'bg-[var(--accent-green)]' : 'bg-[var(--border)]'}`} />
+                  <div className={`h-px w-8 transition-colors duration-200 ${isDone ? 'bg-[var(--accent-green)]' : 'bg-[var(--border)]'}`} />
                 )}
               </div>
             )
@@ -142,17 +217,44 @@ export default function NewDebugPage() {
           <motion.div
             className="h-full bg-gradient-to-r from-[var(--accent-red)] to-[var(--accent-blue)] rounded-full"
             animate={{ width: `${currentStep.progress}%` }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
           />
         </div>
       </div>
 
-      {/* Error message */}
-      {error && (
-        <div className="mb-6 p-4 bg-[rgba(255,77,109,0.1)] border border-[rgba(255,77,109,0.3)] rounded-btn flex items-start gap-3">
-          <AlertCircle className="w-4 h-4 text-[var(--accent-red)] flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-[var(--accent-red)]">{error}</p>
-        </div>
+      {/* Session recovery notice (subtle, not aggressive) */}
+      {(sessionError === 'expired' || isRecovering) && (
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 p-3 bg-[rgba(255,214,10,0.06)] border border-[rgba(255,214,10,0.12)] rounded-md flex items-center gap-2.5"
+        >
+          {isRecovering ? (
+            <>
+              <RefreshCw className="w-3.5 h-3.5 text-[var(--accent-yellow)] animate-spin flex-shrink-0" />
+              <p className="text-[13px] text-[var(--accent-yellow)]">Restoring your debug session...</p>
+            </>
+          ) : (
+            <>
+              <AlertTriangle className="w-3.5 h-3.5 text-[var(--accent-yellow)] flex-shrink-0" />
+              <p className="text-[13px] text-[var(--accent-yellow)]">Session expired — restoring context...</p>
+            </>
+          )}
+        </motion.div>
+      )}
+
+      {/* Error message (only for non-session errors) */}
+      {error && !sessionError && (
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 p-3 bg-[rgba(255,92,124,0.06)] border border-[rgba(255,92,124,0.12)] rounded-md flex items-start gap-2.5"
+        >
+          <AlertCircle className="w-3.5 h-3.5 text-[var(--accent-red)] flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-[13px] text-[var(--accent-red)]">{error}</p>
+          </div>
+        </motion.div>
       )}
 
 
@@ -160,17 +262,17 @@ export default function NewDebugPage() {
         {step === 'input' && (
           <motion.div
             key="input"
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            className="space-y-6"
+            exit={{ opacity: 0, y: -12 }}
+            className="space-y-5"
           >
             <div>
-              <h1 className="text-display text-3xl text-[var(--text-primary)] mb-2">Debug Your Code</h1>
-              <p className="text-[var(--text-secondary)] text-sm">Paste your code and error message to get started</p>
+              <h1 className="text-display text-2xl text-[var(--text-primary)] mb-1.5">Debug Your Code</h1>
+              <p className="text-[var(--text-secondary)] text-[13px]">Paste your code and error message to get started</p>
             </div>
 
-            <div className="card p-6">
+            <div className="card p-5">
               <CodeEditor
                 language={language}
                 code={code}
@@ -186,7 +288,7 @@ export default function NewDebugPage() {
               disabled={isLoading || !code.trim() || !errorMessage.trim()}
               whileHover={!isLoading ? { scale: 1.01 } : {}}
               whileTap={!isLoading ? { scale: 0.99 } : {}}
-              className="btn-primary w-full justify-center py-3 text-base disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary w-full justify-center py-2.5 text-[14px] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <span className="flex items-center gap-2">
@@ -203,9 +305,9 @@ export default function NewDebugPage() {
         {step === 'clarifying' && questions.length > 0 && (
           <motion.div
             key="clarifying"
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
+            exit={{ opacity: 0, y: -12 }}
           >
             <ClarifyingQuestions
               questions={questions}
@@ -218,13 +320,13 @@ export default function NewDebugPage() {
         {step === 'complete' && report && (
           <motion.div
             key="complete"
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
+            exit={{ opacity: 0, y: -12 }}
           >
-            <div className="mb-6">
-              <h1 className="text-display text-3xl text-[var(--text-primary)] mb-2">Your Debug Report</h1>
-              <p className="text-[var(--text-secondary)] text-sm">Here&apos;s everything you need to fix and understand your bug</p>
+            <div className="mb-5">
+              <h1 className="text-display text-2xl text-[var(--text-primary)] mb-1.5">Your Debug Report</h1>
+              <p className="text-[var(--text-secondary)] text-[13px]">Here&apos;s everything you need to fix and understand your bug</p>
             </div>
             <DebugReport
               report={report}

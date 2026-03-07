@@ -43,7 +43,7 @@ Rules:
 - whatToLearn must point to a real, learnable concept
 - similarBugs must be real patterns the dev should watch for
 - Be encouraging but honest
-- CRITICAL: All code fields ("code" in stepByStepFix and "fixedCode") MUST use actual newline characters (\\n) for line breaks. Each statement, brace, or logical block must be on its own line with proper indentation using spaces. NEVER put multiple statements on a single line separated only by semicolons.
+- IMPORTANT: All code values ("code" in stepByStepFix, and "fixedCode") MUST use actual \n newline characters for line breaks — one statement per line, properly indented with spaces. Never write multiple statements on a single line separated by semicolons.
 - Return ONLY valid JSON, no markdown, no extra text
 
 Return format:

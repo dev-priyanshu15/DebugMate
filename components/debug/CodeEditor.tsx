@@ -4,7 +4,14 @@ import dynamic from 'next/dynamic'
 import { SupportedLanguage } from '@/types'
 import { getLanguageIcon } from '@/lib/utils'
 
-const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
+const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[300px] rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center">
+      <span className="text-sm text-[var(--text-muted)]">Loading editor…</span>
+    </div>
+  ),
+})
 
 const LANGUAGES: { value: SupportedLanguage; label: string }[] = [
   { value: 'javascript', label: 'JavaScript' },

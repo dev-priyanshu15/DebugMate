@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { ClarifyingQuestion, DebugReport, SupportedLanguage } from '@/types'
 
 type DebugStep = 'input' | 'clarifying' | 'generating' | 'complete'
@@ -13,6 +14,7 @@ interface DebugSessionState {
     report: DebugReport | null
     isLoading: boolean
     error: string | null
+    sessionError: 'expired' | null
 
     setStep: (step: DebugStep) => void
     setSessionId: (id: string) => void
@@ -23,31 +25,50 @@ interface DebugSessionState {
     setReport: (report: DebugReport) => void
     setLoading: (loading: boolean) => void
     setError: (error: string | null) => void
+    setSessionError: (error: 'expired' | null) => void
     reset: () => void
 }
 
 const initialState = {
     step: 'input' as DebugStep,
-    sessionId: null,
+    sessionId: null as string | null,
     language: 'javascript' as SupportedLanguage,
     code: '',
     errorMessage: '',
-    questions: [],
-    report: null,
+    questions: [] as ClarifyingQuestion[],
+    report: null as DebugReport | null,
     isLoading: false,
-    error: null,
+    error: null as string | null,
+    sessionError: null as 'expired' | null,
 }
 
-export const useDebugSession = create<DebugSessionState>((set) => ({
-    ...initialState,
-    setStep: (step) => set({ step }),
-    setSessionId: (sessionId) => set({ sessionId }),
-    setLanguage: (language) => set({ language }),
-    setCode: (code) => set({ code }),
-    setErrorMessage: (errorMessage) => set({ errorMessage }),
-    setQuestions: (questions) => set({ questions }),
-    setReport: (report) => set({ report }),
-    setLoading: (isLoading) => set({ isLoading }),
-    setError: (error) => set({ error }),
-    reset: () => set(initialState),
-}))
+export const useDebugSession = create<DebugSessionState>()(
+    persist(
+        (set) => ({
+            ...initialState,
+            setStep: (step) => set({ step }),
+            setSessionId: (sessionId) => set({ sessionId }),
+            setLanguage: (language) => set({ language }),
+            setCode: (code) => set({ code }),
+            setErrorMessage: (errorMessage) => set({ errorMessage }),
+            setQuestions: (questions) => set({ questions }),
+            setReport: (report) => set({ report }),
+            setLoading: (isLoading) => set({ isLoading }),
+            setError: (error) => set({ error }),
+            setSessionError: (sessionError) => set({ sessionError }),
+            reset: () => set(initialState),
+        }),
+        {
+            name: 'debugmate-session',
+            partialize: (state) => ({
+                // Only persist essential session data, not transient UI state
+                sessionId: state.sessionId,
+                language: state.language,
+                code: state.code,
+                errorMessage: state.errorMessage,
+                questions: state.questions,
+                step: state.step,
+            }),
+        }
+    )
+)

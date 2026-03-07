@@ -69,21 +69,21 @@ export function PricingCards({ onUpgrade }: PricingCardsProps) {
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly')
 
   return (
-    <section id="pricing" className="py-24 px-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-display text-4xl text-[var(--text-primary)] mb-4">
+    <section id="pricing" className="py-20 px-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-10">
+          <h2 className="text-display text-3xl text-[var(--text-primary)] mb-3">
             Simple, Transparent Pricing
           </h2>
-          <p className="text-[var(--text-secondary)] mb-8">
+          <p className="text-sm text-[var(--text-secondary)] mb-6">
             Start free. Upgrade when you&apos;re ready.
           </p>
 
           {/* Billing toggle */}
-          <div className="inline-flex items-center gap-3 p-1 bg-[var(--surface)] border border-[var(--border)] rounded-btn">
+          <div className="inline-flex items-center gap-1 p-0.5 bg-[var(--surface)] border border-[var(--border)] rounded-md">
             <button
               onClick={() => setBilling('monthly')}
-              className={`px-4 py-1.5 rounded text-sm font-ui transition-all ${
+              className={`px-3 py-1 rounded text-[13px] font-medium transition-all duration-200 ${
                 billing === 'monthly'
                   ? 'bg-[var(--surface-2)] text-[var(--text-primary)]'
                   : 'text-[var(--text-muted)]'
@@ -93,58 +93,58 @@ export function PricingCards({ onUpgrade }: PricingCardsProps) {
             </button>
             <button
               onClick={() => setBilling('yearly')}
-              className={`px-4 py-1.5 rounded text-sm font-ui transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1 rounded text-[13px] font-medium transition-all duration-200 flex items-center gap-1.5 ${
                 billing === 'yearly'
                   ? 'bg-[var(--surface-2)] text-[var(--text-primary)]'
                   : 'text-[var(--text-muted)]'
               }`}
             >
               Yearly
-              <span className="badge-green text-xs">Save 16%</span>
+              <span className="badge-green text-[10px]">Save 16%</span>
             </button>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-5">
           {plans.map((plan, i) => (
             <motion.div
               key={plan.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className={`card p-6 flex flex-col relative ${
+              transition={{ delay: i * 0.08 }}
+              className={`card p-5 flex flex-col relative transition-all duration-200 hover:border-[var(--border-hover)] hover:-translate-y-0.5 ${
                 plan.highlighted ? 'border-[var(--accent-red)] glow-red' : ''
               }`}
             >
               {plan.highlighted && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
                   <span className="badge-red flex items-center gap-1">
-                    <Zap className="w-3 h-3" /> Most Popular
+                    <Zap className="w-2.5 h-2.5" /> Most Popular
                   </span>
                 </div>
               )}
 
-              <div className="mb-6">
-                <h3 className="font-display text-xl text-[var(--text-primary)] mb-1">{plan.name}</h3>
-                <p className="text-xs text-[var(--text-muted)]">{plan.description}</p>
+              <div className="mb-5">
+                <h3 className="font-semibold text-lg text-[var(--text-primary)] mb-0.5">{plan.name}</h3>
+                <p className="text-[12px] text-[var(--text-muted)]">{plan.description}</p>
               </div>
 
-              <div className="mb-6">
-                <div className="flex items-end gap-1">
-                  <span className="text-4xl font-display text-[var(--text-primary)]">
+              <div className="mb-5">
+                <div className="flex items-end gap-0.5">
+                  <span className="text-3xl font-display text-[var(--text-primary)]">
                     {plan.price[billing] === 0 ? '₹0' : `₹${plan.price[billing].toLocaleString('en-IN')}`}
                   </span>
                   {plan.price[billing] > 0 && (
-                    <span className="text-[var(--text-muted)] text-sm mb-1">/{billing === 'monthly' ? 'mo' : 'yr'}</span>
+                    <span className="text-[var(--text-muted)] text-[12px] mb-1">/{billing === 'monthly' ? 'mo' : 'yr'}</span>
                   )}
                 </div>
-                <p className="text-xs text-[var(--text-muted)] mt-1">{plan.sessions} sessions</p>
+                <p className="text-[11px] text-[var(--text-muted)] mt-0.5">{plan.sessions} sessions</p>
               </div>
 
-              <ul className="space-y-2.5 flex-1 mb-6">
+              <ul className="space-y-2 flex-1 mb-5">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
-                    <Check className="w-4 h-4 text-[var(--accent-green)] flex-shrink-0 mt-0.5" />
+                  <li key={feature} className="flex items-start gap-2 text-[13px] text-[var(--text-secondary)]">
+                    <Check className="w-3.5 h-3.5 text-[var(--accent-green)] flex-shrink-0 mt-0.5" />
                     {feature}
                   </li>
                 ))}
@@ -152,20 +152,20 @@ export function PricingCards({ onUpgrade }: PricingCardsProps) {
 
               {plan.id === 'free' ? (
                 <Link href={plan.href!}>
-                  <button className="btn-secondary w-full justify-center text-sm py-2.5">
+                  <button className="btn-secondary w-full justify-center text-[13px] py-2">
                     {plan.cta}
                   </button>
                 </Link>
               ) : plan.id === 'bootcamp' ? (
                 <a href="mailto:hello@debugmate.dev">
-                  <button className="btn-secondary w-full justify-center text-sm py-2.5">
+                  <button className="btn-secondary w-full justify-center text-[13px] py-2">
                     {plan.cta}
                   </button>
                 </a>
               ) : (
                 <button
                   onClick={() => onUpgrade?.(plan.id, billing)}
-                  className="btn-primary w-full justify-center text-sm py-2.5"
+                  className="btn-primary w-full justify-center text-[13px] py-2"
                 >
                   {plan.cta}
                 </button>

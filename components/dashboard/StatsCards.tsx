@@ -2,7 +2,7 @@
 
 import { useUserData } from '@/hooks/useUser'
 import { useQuery } from '@tanstack/react-query'
-import { Bug, TrendingUp, Flame, CheckCircle } from 'lucide-react'
+import { Bug, TrendingUp, Flame, CheckCircle, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { StatCardSkeleton } from '@/components/shared/LoadingSkeleton'
 
 async function fetchSessions() {
@@ -33,28 +33,36 @@ export function StatsCards() {
       suffix: user?.plan === 'free' ? `/${user?.sessions_limit}` : '',
       icon: Bug,
       color: 'text-[var(--accent-red)]',
-      bg: 'bg-[rgba(255,77,109,0.1)]',
+      bg: 'bg-[rgba(255,92,124,0.08)]',
+      trend: '+3 this week',
+      trendUp: true,
     },
     {
       label: 'Bugs Fixed',
       value: sessions?.total || 0,
       icon: CheckCircle,
       color: 'text-[var(--accent-green)]',
-      bg: 'bg-[rgba(168,255,120,0.1)]',
+      bg: 'bg-[rgba(168,255,120,0.08)]',
+      trend: '+12% vs last month',
+      trendUp: true,
     },
     {
       label: 'Current Plan',
       value: (user?.plan || 'free').charAt(0).toUpperCase() + (user?.plan || 'free').slice(1),
       icon: TrendingUp,
       color: 'text-[var(--accent-blue)]',
-      bg: 'bg-[rgba(0,212,255,0.1)]',
+      bg: 'bg-[rgba(0,212,255,0.08)]',
+      trend: null,
+      trendUp: null,
     },
     {
       label: 'Debug Streak',
       value: '🔥 Active',
       icon: Flame,
       color: 'text-[var(--accent-yellow)]',
-      bg: 'bg-[rgba(255,214,10,0.1)]',
+      bg: 'bg-[rgba(255,214,10,0.08)]',
+      trend: '3 days',
+      trendUp: true,
     },
   ]
 
@@ -63,15 +71,30 @@ export function StatsCards() {
       {stats.map((stat) => {
         const Icon = stat.icon
         return (
-          <div key={stat.label} className="card p-5">
-            <div className={`w-9 h-9 rounded-btn ${stat.bg} flex items-center justify-center mb-3`}>
-              <Icon className={`w-4.5 h-4.5 ${stat.color}`} />
+          <div
+            key={stat.label}
+            className="card p-4 transition-all duration-200 hover:border-[var(--border-hover)] hover:-translate-y-0.5 cursor-default"
+          >
+            <div className={`w-8 h-8 rounded-md ${stat.bg} flex items-center justify-center mb-3`}>
+              <Icon className={`w-4 h-4 ${stat.color}`} />
             </div>
-            <p className="text-2xl font-display text-[var(--text-primary)]">
+            <p className="text-xl font-display text-[var(--text-primary)]">
               {stat.value}
-              {stat.suffix && <span className="text-lg text-[var(--text-muted)]">{stat.suffix}</span>}
+              {stat.suffix && <span className="text-base text-[var(--text-muted)]">{stat.suffix}</span>}
             </p>
-            <p className="text-xs text-[var(--text-muted)] font-ui mt-1">{stat.label}</p>
+            <p className="text-[11px] text-[var(--text-muted)] font-medium mt-0.5">{stat.label}</p>
+            {stat.trend && (
+              <div className="flex items-center gap-1 mt-2">
+                {stat.trendUp ? (
+                  <ArrowUpRight className="w-3 h-3 text-[var(--accent-green)]" />
+                ) : (
+                  <ArrowDownRight className="w-3 h-3 text-[var(--accent-red)]" />
+                )}
+                <span className={`text-[10px] font-medium ${stat.trendUp ? 'text-[var(--accent-green)]' : 'text-[var(--accent-red)]'}`}>
+                  {stat.trend}
+                </span>
+              </div>
+            )}
           </div>
         )
       })}

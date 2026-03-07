@@ -52,7 +52,11 @@ export async function POST(request: NextRequest) {
         const session = await loadSession(sessionId)
         if (!session) {
             return Response.json(
-                { error: 'Session expired. Please start a new debug session.', code: 'SESSION_NOT_FOUND' },
+                {
+                    error: 'Your debug session expired. We can restore your context so you can continue.',
+                    code: 'SESSION_NOT_FOUND',
+                    recoverable: true,
+                },
                 { status: 404 }
             )
         }

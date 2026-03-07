@@ -8,6 +8,18 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['winston'],
   },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Required for @monaco-editor/react — fixes "Loading chunk ... undefined" error
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        os: false,
+      }
+    }
+    return config
+  },
 }
 
 module.exports = nextConfig

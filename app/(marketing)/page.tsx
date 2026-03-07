@@ -58,30 +58,42 @@ export default function LandingPage() {
       <Hero />
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <FadeIn className="text-center mb-16">
-            <h2 className="text-display text-4xl text-[var(--text-primary)] mb-4">
+      <section id="how-it-works" className="py-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <FadeIn className="text-center mb-12">
+            <h2 className="text-display text-3xl text-[var(--text-primary)] mb-3">
               How DebugMate Works
             </h2>
-            <p className="text-[var(--text-secondary)]">Three steps to understanding your bug</p>
+            <p className="text-sm text-[var(--text-secondary)]">Three steps to understanding your bug</p>
           </FadeIn>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {howItWorksSteps.map((step, i) => (
-              <FadeIn key={step.step} delay={i * 0.12} direction="up">
-                <div className="card card-hover p-6 text-center h-full">
-                  <div
-                    className="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-display text-white mx-auto mb-4"
-                    style={{ background: step.color }}
+          {/* Steps with connecting line */}
+          <div className="relative">
+            {/* Connecting line */}
+            <div className="hidden md:block absolute top-[44px] left-[calc(16.666%+28px)] right-[calc(16.666%+28px)] h-[1px] bg-[var(--border)]" />
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {howItWorksSteps.map((step, i) => (
+                <FadeIn key={step.step} delay={i * 0.1} direction="up">
+                  <div className="card p-6 text-center h-full transition-all duration-200 hover:border-[var(--border-hover)] hover:-translate-y-0.5 group"
+                    style={{
+                      ['--glow-color' as string]: step.color,
+                    }}
                   >
-                    {step.step}
+                    <div className="relative z-10">
+                      <div
+                        className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-display text-white mx-auto mb-4 transition-shadow duration-200 group-hover:shadow-[0_0_16px_var(--glow-color)]"
+                        style={{ background: step.color, ['--glow-color' as string]: `${step.color}40` }}
+                      >
+                        {step.step}
+                      </div>
+                      <h3 className="font-semibold text-[15px] text-[var(--text-primary)] mb-1.5">{step.title}</h3>
+                      <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed">{step.description}</p>
+                    </div>
                   </div>
-                  <h3 className="font-display text-lg text-[var(--text-primary)] mb-2">{step.title}</h3>
-                  <p className="text-sm text-[var(--text-secondary)]">{step.description}</p>
-                </div>
-              </FadeIn>
-            ))}
+                </FadeIn>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -99,19 +111,19 @@ export default function LandingPage() {
       </FadeIn>
 
       {/* FAQ */}
-      <section className="py-24 px-6">
-        <div className="max-w-3xl mx-auto">
+      <section className="py-20 px-6">
+        <div className="max-w-2xl mx-auto">
           <FadeIn>
-            <h2 className="text-display text-4xl text-[var(--text-primary)] text-center mb-12">
+            <h2 className="text-display text-3xl text-[var(--text-primary)] text-center mb-10">
               Frequently Asked Questions
             </h2>
           </FadeIn>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {faqs.map((faq, i) => (
-              <FadeIn key={faq.q} delay={i * 0.08} direction="up">
-                <div className="card card-hover p-6">
-                  <h3 className="font-ui text-[var(--text-primary)] mb-2">{faq.q}</h3>
-                  <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{faq.a}</p>
+              <FadeIn key={faq.q} delay={i * 0.06} direction="up">
+                <div className="card card-hover p-5">
+                  <h3 className="font-semibold text-[14px] text-[var(--text-primary)] mb-1.5">{faq.q}</h3>
+                  <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed">{faq.a}</p>
                 </div>
               </FadeIn>
             ))}
@@ -121,18 +133,18 @@ export default function LandingPage() {
 
       {/* Final CTA */}
       <FadeIn direction="up">
-        <section className="py-24 px-6 text-center">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-display text-5xl text-[var(--text-primary)] mb-4">
+        <section className="py-20 px-6 text-center">
+          <div className="max-w-lg mx-auto">
+            <h2 className="text-display text-3xl text-[var(--text-primary)] mb-3">
               Start debugging smarter today
             </h2>
-            <p className="text-[var(--text-secondary)] mb-8">
+            <p className="text-sm text-[var(--text-secondary)] mb-6">
               Free forever. No credit card required.
             </p>
             <Link href="/sign-up">
-              <button className="btn-primary text-lg py-4 px-8">
+              <button className="btn-primary text-base py-3 px-7">
                 Start Free — 10 Sessions/Month
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4" />
               </button>
             </Link>
           </div>
@@ -140,18 +152,18 @@ export default function LandingPage() {
       </FadeIn>
 
       {/* Footer */}
-      <footer className="border-t border-[var(--border)] py-12 px-6">
+      <footer className="border-t border-[var(--border)] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <img src="/logo.svg" alt="DebugMate Logo" width={24} height={24} className="rounded-md" />
-            <span className="font-display text-sm text-[var(--text-primary)]">DebugMate</span>
+            <img src="/logo.svg" alt="DebugMate Logo" width={20} height={20} className="rounded" />
+            <span className="font-semibold text-[13px] text-[var(--text-primary)]">DebugMate</span>
           </div>
-          <div className="flex gap-6 text-xs text-[var(--text-muted)]">
+          <div className="flex gap-6 text-[12px] text-[var(--text-muted)]">
             <Link href="/pricing" className="hover:text-[var(--text-secondary)] transition-colors">Pricing</Link>
             <Link href="/blog" className="hover:text-[var(--text-secondary)] transition-colors">Blog</Link>
             <a href="mailto:dev.priyanshu.singh@gmail.com" className="hover:text-[var(--text-secondary)] transition-colors">Contact</a>
           </div>
-          <p className="text-xs text-[var(--text-muted)]">© 2026 DebugMate. All rights reserved.</p>
+          <p className="text-[11px] text-[var(--text-muted)]">© 2026 DebugMate. All rights reserved.</p>
         </div>
       </footer>
     </div>

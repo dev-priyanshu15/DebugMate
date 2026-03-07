@@ -1,21 +1,33 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import { DebugReport as DebugReportType } from '@/types'
 import { WhatToLearnCard } from './WhatToLearnCard'
-import { copyToClipboard, getSeverityColor } from '@/lib/utils'
+import { copyToClipboard } from '@/lib/utils'
 import {
   AlertTriangle,
   CheckCircle,
   Code2,
-  BookOpen,
   Lightbulb,
   Heart,
   Copy,
   Check,
   Download,
 } from 'lucide-react'
+
+const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
+  ssr: false,
+  loading: () => (
+    <div
+      className="w-full rounded-lg flex items-center justify-center"
+      style={{ height: 200, background: '#0d0d15', border: '1px solid var(--border)' }}
+    >
+      <span className="text-sm" style={{ color: '#546e7a' }}>Loading editor…</span>
+    </div>
+  ),
+})
 
 interface DebugReportProps {
   report: DebugReportType
@@ -24,73 +36,18 @@ interface DebugReportProps {
   onDebugAnother?: () => void
 }
 
-// Normalize escaped \n sequences into real newlines
-function normalizeCode(code: string): string {
-  return code
+/** Convert escaped \n / \t sequences into real whitespace */
+function normalizeCode(raw: string): string {
+  return raw
     .replace(/\\n/g, '\n')
     .replace(/\\t/g, '  ')
     .trim()
 }
 
-// Lightweight tokenizer — returns JSX spans with syntax colors
-function tokenizeLine(line: string, idx: number) {
-  // Tokenize by regex in priority order
-  const tokens: { type: string; value: string }[] = []
-  let remaining = line
-
-  const patterns: [string, RegExp][] = [
-    ['comment',   /^\/\/.*|^\/\*[\s\S]*?\*\//],
-    ['string',    /^("[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*'|`[^`\\]*(?:\\.[^`\\]*)*`)/],
-    ['number',    /^\b\d+\.?\d*\b/],
-    ['keyword',   /^\b(const|let|var|function|return|if|else|for|while|do|class|new|this|import|export|default|from|async|await|try|catch|finally|throw|typeof|instanceof|in|of|null|undefined|true|false|void|switch|case|break|continue|extends|implements|interface|type|enum|static|public|private|protected)\b/],
-    ['builtin',   /^\b(console|Math|Object|Array|String|Number|Boolean|Promise|JSON|Error|Date|Map|Set|fetch|setTimeout|clearTimeout|require|module|process)\b/],
-    ['fn',        /^\b([a-zA-Z_$][\w$]*)(?=\s*\()/],
-    ['punct',     /^[{}()\[\]<>,;:=!&|.+\-*/%?^~]+/],
-    ['ident',     /^[a-zA-Z_$][\w$]*/],
-    ['space',     /^\s+/],
-    ['other',     /^./],
-  ]
-
-  while (remaining.length > 0) {
-    let matched = false
-    for (const [type, rx] of patterns) {
-      const m = remaining.match(rx)
-      if (m) {
-        tokens.push({ type, value: m[0] })
-        remaining = remaining.slice(m[0].length)
-        matched = true
-        break
-      }
-    }
-    if (!matched) break
-  }
-
-  const colorMap: Record<string, string> = {
-    keyword:  '#c792ea',
-    string:   '#c3e88d',
-    number:   '#f78c6c',
-    comment:  '#546e7a',
-    builtin:  '#82aaff',
-    fn:       '#82aaff',
-    punct:    '#89ddff',
-    ident:    '#eeffff',
-    space:    'inherit',
-    other:    '#eeffff',
-  }
-
-  return (
-    <span key={idx}>
-      {tokens.map((t, i) => (
-        <span key={i} style={{ color: colorMap[t.type] ?? 'inherit' }}>{t.value}</span>
-      ))}
-    </span>
-  )
-}
-
-function CodeBlock({ code }: { code: string }) {
+/** Step snippet: <pre><code> styled block */
+function StepCodeBlock({ code }: { code: string }) {
   const [copied, setCopied] = useState(false)
   const normalized = normalizeCode(code)
-  const lines = normalized.split('\n')
 
   const handleCopy = async () => {
     await copyToClipboard(normalized)
@@ -99,39 +56,74 @@ function CodeBlock({ code }: { code: string }) {
   }
 
   return (
-    <div className="relative group rounded-lg overflow-hidden" style={{ background: '#0d1117', border: '1px solid var(--border)' }}>
-      {/* Line numbers + code */}
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse" style={{ fontFamily: "'DM Mono', 'Fira Code', monospace", fontSize: '0.8125rem', lineHeight: '1.65' }}>
-          <tbody>
-            {lines.map((line, i) => (
-              <tr key={i} className="hover:bg-white/5 transition-colors">
-                <td
-                  className="select-none text-right pr-4 pl-4 align-top"
-                  style={{ color: '#3d4f5c', minWidth: '2.5rem', userSelect: 'none', borderRight: '1px solid #1e2a35' }}
-                >
-                  {i + 1}
-                </td>
-                <td className="pl-4 pr-6 align-top whitespace-pre">
-                  {tokenizeLine(line, i)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {/* Copy button */}
+    <div className="relative group">
+      <pre
+        style={{
+          whiteSpace: 'pre',
+          overflowX: 'auto',
+          lineHeight: 1.6,
+          padding: '16px',
+          borderRadius: '8px',
+          background: '#0d0d15',
+          fontFamily: "'DM Mono', 'Fira Code', monospace",
+          fontSize: '13px',
+          display: 'block',
+          width: '100%',
+          border: '1px solid var(--border)',
+          color: '#e2e8f0',
+          margin: 0,
+        }}
+      >
+        <code>{normalized}</code>
+      </pre>
       <button
         onClick={handleCopy}
         className="absolute top-2 right-2 p-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{ background: '#1e2a35', border: '1px solid #2d3f4e' }}
+        style={{ background: '#1a1f2e', border: '1px solid var(--border)' }}
       >
-        {copied ? (
-          <Check className="w-3.5 h-3.5 text-[var(--accent-green)]" />
-        ) : (
-          <Copy className="w-3.5 h-3.5" style={{ color: '#546e7a' }} />
-        )}
+        {copied
+          ? <Check className="w-3.5 h-3.5 text-[var(--accent-green)]" />
+          : <Copy className="w-3.5 h-3.5 text-[var(--text-muted)]" />}
       </button>
+    </div>
+  )
+}
+
+/** Fixed code: Monaco in read-only mode, auto height by line count */
+function MonacoCodeBlock({ code, language }: { code: string; language?: string }) {
+  const normalized = normalizeCode(code)
+  const lineCount = normalized.split('\n').length
+  // ~19px per line + 24px padding top/bottom, min 120, max 600
+  const height = Math.min(Math.max(lineCount * 19 + 24, 120), 600)
+
+  return (
+    <div className="rounded-lg overflow-hidden" style={{ border: '1px solid var(--border)' }}>
+      <MonacoEditor
+        height={height}
+        language={language ?? 'javascript'}
+        value={normalized}
+        theme="vs-dark"
+        options={{
+          readOnly: true,
+          minimap: { enabled: false },
+          lineNumbers: 'on',
+          wordWrap: 'off',
+          scrollBeyondLastLine: false,
+          fontSize: 13,
+          fontFamily: "'DM Mono', 'Fira Code', monospace",
+          lineHeight: 20,
+          padding: { top: 12, bottom: 12 },
+          renderLineHighlight: 'none',
+          overviewRulerBorder: false,
+          hideCursorInOverviewRuler: true,
+          scrollbar: { vertical: 'auto', horizontal: 'auto' },
+          contextmenu: false,
+          folding: false,
+          glyphMargin: false,
+          lineDecorationsWidth: 0,
+          renderFinalNewline: 'off',
+        }}
+      />
     </div>
   )
 }
@@ -140,13 +132,13 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
   const [copiedFixed, setCopiedFixed] = useState(false)
 
   const handleCopyFixed = async () => {
-    await copyToClipboard(report.fixedCode)
+    await copyToClipboard(normalizeCode(report.fixedCode))
     setCopiedFixed(true)
     setTimeout(() => setCopiedFixed(false), 2000)
   }
 
   const handleDownload = () => {
-    const blob = new Blob([report.fixedCode], { type: 'text/plain' })
+    const blob = new Blob([normalizeCode(report.fixedCode)], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -184,7 +176,7 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="card p-6 border-l-4 border-l-[var(--accent-green)] overflow-hidden"
+        className="card p-6 border-l-4 border-l-[var(--accent-green)]"
       >
         <div className="flex items-center gap-2 mb-5">
           <CheckCircle className="w-5 h-5 text-[var(--accent-green)]" />
@@ -198,7 +190,7 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
               </div>
               <div className="flex-1 min-w-0 space-y-2">
                 <p className="font-ui text-sm text-[var(--text-primary)]">{step.instruction}</p>
-                {step.code && <CodeBlock code={step.code} />}
+                {step.code && <StepCodeBlock code={step.code} />}
                 <p className="text-xs text-[var(--text-muted)] italic">{step.explanation}</p>
               </div>
             </div>
@@ -211,7 +203,7 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="card p-6 overflow-hidden"
+        className="card p-6"
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -235,7 +227,7 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
             </button>
           </div>
         </div>
-        <CodeBlock code={report.fixedCode} />
+        <MonacoCodeBlock code={report.fixedCode} language={report.errorCategory?.includes('python') ? 'python' : report.errorCategory?.includes('java') ? 'java' : 'javascript'} />
       </motion.div>
 
       {/* What To Learn */}

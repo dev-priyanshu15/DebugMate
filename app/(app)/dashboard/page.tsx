@@ -11,14 +11,14 @@ export default async function DashboardPage() {
   const user = await currentUser()
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-display text-3xl text-[var(--text-primary)]">
+          <h1 className="text-display text-2xl text-[var(--text-primary)]">
             Welcome back, {user?.firstName || 'Developer'} 👋
           </h1>
-          <p className="text-[var(--text-secondary)] text-sm mt-1">
+          <p className="text-[var(--text-secondary)] text-[13px] mt-0.5">
             Ready to debug smarter today?
           </p>
         </div>

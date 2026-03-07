@@ -33,18 +33,20 @@ export class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="flex flex-col items-center justify-center min-h-[200px] p-8 card">
-          <AlertTriangle className="w-10 h-10 text-[var(--accent-red)] mb-4" />
-          <h3 className="text-lg font-display text-[var(--text-primary)] mb-2">
-            Something went wrong
+          <div className="w-12 h-12 rounded-xl bg-[rgba(255,92,124,0.08)] flex items-center justify-center mb-4">
+            <AlertTriangle className="w-5 h-5 text-[var(--accent-red)]" />
+          </div>
+          <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">
+            We couldn&apos;t analyze this error yet
           </h3>
-          <p className="text-sm text-[var(--text-muted)] text-center mb-6 max-w-sm">
-            {this.state.error?.message || 'An unexpected error occurred. Please try again.'}
+          <p className="text-[13px] text-[var(--text-muted)] text-center mb-5 max-w-sm">
+            Try adding more context or refreshing the page. If the problem persists, please contact support.
           </p>
           <button
             onClick={() => this.setState({ hasError: false, error: null })}
-            className="btn-secondary text-sm flex items-center gap-2"
+            className="btn-primary text-[13px] flex items-center gap-2"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="w-3.5 h-3.5" />
             Try Again
           </button>
         </div>
