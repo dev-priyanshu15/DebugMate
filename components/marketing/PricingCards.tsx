@@ -1,150 +1,153 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { motion, useInView } from 'framer-motion'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { Check, Zap } from 'lucide-react'
 
 const plans = [
   {
     id: 'free',
     name: 'Free',
+    description: 'For trying it out or light usage',
     price: { monthly: 0, yearly: 0 },
     sessions: '10/month',
-    description: 'Perfect for getting started',
     features: [
-      '10 debug sessions/month',
-      'Core debug flow',
-      'What To Learn card',
-      'Last 5 sessions history',
-      'Max 5,000 char code',
+      '10 debug sessions per month',
+      'Full debug reports with root cause',
+      'What To Learn recommendations',
+      'Session history (last 30 days)',
     ],
     cta: 'Start Free',
-    href: '/sign-up',
     highlighted: false,
+    padding: '24px',
+    href: '/sign-up',
   },
   {
     id: 'pro',
     name: 'Pro',
-    price: { monthly: 199, yearly: 1999 },
+    description: 'For daily debugging and learning',
+    price: { monthly: 499, yearly: 4990 },
     sessions: 'Unlimited',
-    description: 'For serious developers',
     features: [
       'Unlimited debug sessions',
-      'Full session history forever',
-      'Weak spot tracking',
-      'Public report sharing',
+      'Full debug reports with root cause',
+      'Weak spot analysis over time',
       'Priority AI processing',
-      'Max 10,000 char code',
-      'API access',
+      'Session history (forever)',
+      'Export reports as PDF',
     ],
     cta: 'Upgrade to Pro',
     highlighted: true,
+    padding: '24px',
   },
   {
     id: 'bootcamp',
     name: 'Bootcamp',
-    price: { monthly: 2999, yearly: 2999 * 10 },
-    sessions: 'Unlimited (50 seats)',
-    description: 'For coding schools & teams',
+    description: 'For instructors running a cohort',
+    price: { monthly: 2999, yearly: 29990 },
+    sessions: '50 seats',
     features: [
       'Everything in Pro',
-      '50 student seats',
+      'Up to 50 student seats',
       'Instructor dashboard',
-      'Student analytics',
-      'Custom invoice',
-      'Priority support',
-      'Bulk session management',
+      'Student-level weak spot tracking',
+      'Team invite via code',
+      'Priority email support',
     ],
     cta: 'Contact Us',
     highlighted: false,
+    padding: '28px',
   },
 ]
 
+const easeOut = [0, 0, 0.2, 1] as const
+
 interface PricingCardsProps {
-  onUpgrade?: (plan: string, billing: 'monthly' | 'yearly') => void
+  onUpgrade?: (planId: string, billing: 'monthly' | 'yearly') => void
 }
 
 export function PricingCards({ onUpgrade }: PricingCardsProps) {
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly')
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, amount: 0.15 })
 
   return (
-    <section id="pricing" className="py-20 px-6">
+    <section className="py-[72px] px-6">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-10">
-          <h2 className="text-display text-3xl text-[var(--text-primary)] mb-3">
-            Simple, Transparent Pricing
-          </h2>
-          <p className="text-sm text-[var(--text-secondary)] mb-6">
-            Start free. Upgrade when you&apos;re ready.
-          </p>
+        <motion.div
+          className="mb-10"
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.4, ease: easeOut }}
+        >
+          <h2 className="text-display text-3xl text-[var(--text)] mb-2">What it costs</h2>
+          <p className="text-[13px] text-[var(--muted)] mb-6">Two plans and a team option. That&apos;s it.</p>
 
           {/* Billing toggle */}
-          <div className="inline-flex items-center gap-1 p-0.5 bg-[var(--surface)] border border-[var(--border)] rounded-md">
+          <div className="inline-flex items-center gap-0.5 p-[3px] border border-[var(--border)] rounded-md" style={{ background: 'var(--surface)' }}>
             <button
               onClick={() => setBilling('monthly')}
-              className={`px-3 py-1 rounded text-[13px] font-medium transition-all duration-200 ${
-                billing === 'monthly'
-                  ? 'bg-[var(--surface-2)] text-[var(--text-primary)]'
-                  : 'text-[var(--text-muted)]'
-              }`}
+              className="px-3 py-1 rounded text-[13px] font-medium transition-all duration-200"
+              style={{
+                background: billing === 'monthly' ? 'var(--accent)' : 'transparent',
+                color: billing === 'monthly' ? 'white' : 'var(--muted-2)',
+              }}
             >
               Monthly
             </button>
             <button
               onClick={() => setBilling('yearly')}
-              className={`px-3 py-1 rounded text-[13px] font-medium transition-all duration-200 flex items-center gap-1.5 ${
-                billing === 'yearly'
-                  ? 'bg-[var(--surface-2)] text-[var(--text-primary)]'
-                  : 'text-[var(--text-muted)]'
-              }`}
+              className="px-3 py-1 rounded text-[13px] font-medium transition-all duration-200 flex items-center gap-2"
+              style={{
+                background: billing === 'yearly' ? 'var(--accent)' : 'transparent',
+                color: billing === 'yearly' ? 'white' : 'var(--muted-2)',
+              }}
             >
               Yearly
-              <span className="badge-green text-[10px]">Save 16%</span>
+              <span className="tag text-[10px]">SAVE 16%</span>
             </button>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-5">
+        <div ref={ref} className="grid md:grid-cols-3 gap-5 items-start">
           {plans.map((plan, i) => (
             <motion.div
               key={plan.id}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
-              className={`card p-5 flex flex-col relative transition-all duration-200 hover:border-[var(--border-hover)] hover:-translate-y-0.5 ${
-                plan.highlighted ? 'border-[var(--accent-red)] glow-red' : ''
-              }`}
+              initial={{ opacity: 0, y: 12 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+              transition={{ duration: 0.38, delay: i * 0.09, ease: easeOut }}
+              className="card-hover relative"
+              style={{
+                padding: plan.padding,
+                borderColor: plan.highlighted ? 'var(--accent)' : undefined,
+              }}
             >
               {plan.highlighted && (
-                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
-                  <span className="badge-red flex items-center gap-1">
-                    <Zap className="w-2.5 h-2.5" /> Most Popular
-                  </span>
+                <div className="absolute top-3 right-3">
+                  <span className="tag-bordered text-[9px]">POPULAR</span>
                 </div>
               )}
 
               <div className="mb-5">
-                <h3 className="font-semibold text-lg text-[var(--text-primary)] mb-0.5">{plan.name}</h3>
-                <p className="text-[12px] text-[var(--text-muted)]">{plan.description}</p>
+                <h3 className="font-bold text-lg text-[var(--text)] mb-0.5">{plan.name}</h3>
+                <p className="text-[11px] text-[var(--muted-2)]">{plan.description}</p>
               </div>
 
-              <div className="mb-5">
-                <div className="flex items-end gap-0.5">
-                  <span className="text-3xl font-display text-[var(--text-primary)]">
-                    {plan.price[billing] === 0 ? '₹0' : `₹${plan.price[billing].toLocaleString('en-IN')}`}
-                  </span>
-                  {plan.price[billing] > 0 && (
-                    <span className="text-[var(--text-muted)] text-[12px] mb-1">/{billing === 'monthly' ? 'mo' : 'yr'}</span>
-                  )}
-                </div>
-                <p className="text-[11px] text-[var(--text-muted)] mt-0.5">{plan.sessions} sessions</p>
+              <div className="mb-6">
+                <span className="text-[36px] font-bold font-mono text-[var(--text)]">
+                  {plan.price[billing] === 0 ? '₹0' : `₹${plan.price[billing].toLocaleString('en-IN')}`}
+                </span>
+                {plan.price[billing] > 0 && (
+                  <span className="text-[var(--muted-2)] text-[12px] ml-1">/{billing === 'monthly' ? 'mo' : 'yr'}</span>
+                )}
+                <p className="text-[11px] text-[var(--muted-2)] mt-0.5">{plan.sessions} sessions</p>
               </div>
 
-              <ul className="space-y-2 flex-1 mb-5">
+              <ul className="space-y-2 mb-6">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2 text-[13px] text-[var(--text-secondary)]">
-                    <Check className="w-3.5 h-3.5 text-[var(--accent-green)] flex-shrink-0 mt-0.5" />
+                  <li key={feature} className="flex items-start gap-2 text-[13px] text-[var(--muted)]">
+                    <span className="text-[var(--accent)] mt-0.5">→</span>
                     {feature}
                   </li>
                 ))}
@@ -152,23 +155,14 @@ export function PricingCards({ onUpgrade }: PricingCardsProps) {
 
               {plan.id === 'free' ? (
                 <Link href={plan.href!}>
-                  <button className="btn-secondary w-full justify-center text-[13px] py-2">
-                    {plan.cta}
-                  </button>
+                  <button className="btn-secondary w-full justify-center text-[13px]">{plan.cta}</button>
                 </Link>
               ) : plan.id === 'bootcamp' ? (
                 <a href="mailto:hello@debugmate.dev">
-                  <button className="btn-secondary w-full justify-center text-[13px] py-2">
-                    {plan.cta}
-                  </button>
+                  <button className="btn-secondary w-full justify-center text-[13px]">{plan.cta}</button>
                 </a>
               ) : (
-                <button
-                  onClick={() => onUpgrade?.(plan.id, billing)}
-                  className="btn-primary w-full justify-center text-[13px] py-2"
-                >
-                  {plan.cta}
-                </button>
+                <button onClick={() => onUpgrade?.(plan.id, billing)} className="btn-primary w-full justify-center text-[13px]">{plan.cta}</button>
               )}
             </motion.div>
           ))}

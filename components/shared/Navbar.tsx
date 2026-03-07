@@ -6,7 +6,6 @@ import { useUser } from '@clerk/nextjs'
 import { useTheme } from 'next-themes'
 import { motion } from 'framer-motion'
 import { Menu, X, Sun, Moon } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 export function Navbar() {
   const { isSignedIn } = useUser()
@@ -22,103 +21,100 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark')
-
   return (
-    <header
-      className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-200',
-        scrolled
-          ? 'bg-[var(--bg)]/90 backdrop-blur-md border-b border-[var(--border)]'
-          : 'bg-transparent'
-      )}
+    <motion.header
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-200"
+      style={{
+        height: '58px',
+        background: 'var(--nav-bg)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
+        borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
+      }}
     >
-      <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-6 h-full flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <img src="/logo.svg" alt="DebugMate Logo" width={28} height={28} className="rounded-md" />
-          <span className="text-display text-base text-[var(--text-primary)]">DebugMate</span>
+        <Link href="/" className="flex items-center gap-2.5">
+          <span className="text-display text-[15px] text-[var(--text)]">DebugMate</span>
+          <span
+            className="inline-block w-[7px] h-[7px] rounded-full bg-[var(--accent)]"
+            style={{ animation: 'pulse-dot 2s ease-in-out infinite' }}
+          />
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-6">
-          <Link href="/pricing" className="nav-link text-[13px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+        {/* Desktop nav links */}
+        <nav className="hidden md:flex items-center gap-8">
+          <Link href="/pricing" className="text-[13px] text-[var(--muted)] hover:text-[var(--text)] transition-colors duration-150">
             Pricing
           </Link>
-          <Link href="/blog" className="nav-link text-[13px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+          <Link href="/blog" className="text-[13px] text-[var(--muted)] hover:text-[var(--text)] transition-colors duration-150">
             Blog
           </Link>
         </nav>
 
-        {/* CTA buttons + theme toggle */}
-        <div className="hidden md:flex items-center gap-2.5">
-          {/* Theme toggle */}
+        {/* Right side */}
+        <div className="hidden md:flex items-center gap-3">
           {mounted && (
             <button
-              onClick={toggleTheme}
-              className="w-8 h-8 rounded-md border border-[var(--border)] bg-[var(--surface)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all duration-200"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="w-7 h-7 flex items-center justify-center text-[var(--muted)] hover:text-[var(--text)] transition-colors duration-150"
               aria-label="Toggle theme"
             >
-              {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+              {theme === 'dark' ? <Sun className="w-[14px] h-[14px]" /> : <Moon className="w-[14px] h-[14px]" />}
             </button>
           )}
 
           {isSignedIn ? (
             <Link href="/dashboard">
-              <button className="btn-primary text-[13px]">Dashboard</button>
+              <button className="btn-primary text-[13px] py-[7px] px-[14px]">Dashboard</button>
             </Link>
           ) : (
             <>
-              <Link href="/sign-in">
-                <button className="btn-secondary text-[13px]">Sign In</button>
+              <Link href="/sign-in" className="text-[13px] text-[var(--muted)] hover:text-[var(--text)] transition-colors duration-150">
+                Sign In
               </Link>
               <Link href="/sign-up">
-                <button className="btn-primary text-[13px]">Start Free</button>
+                <button className="btn-primary text-[13px] py-[7px] px-[14px]">Start Free</button>
               </Link>
             </>
           )}
         </div>
 
-        {/* Mobile: theme toggle + menu button */}
+        {/* Mobile */}
         <div className="md:hidden flex items-center gap-2">
           {mounted && (
             <button
-              onClick={toggleTheme}
-              className="w-8 h-8 rounded-md border border-[var(--border)] bg-[var(--surface)] flex items-center justify-center text-[var(--text-secondary)]"
-              aria-label="Toggle theme"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="w-7 h-7 flex items-center justify-center text-[var(--muted)]"
             >
-              {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+              {theme === 'dark' ? <Sun className="w-[14px] h-[14px]" /> : <Moon className="w-[14px] h-[14px]" />}
             </button>
           )}
-          <button
-            className="text-[var(--text-secondary)] p-1"
-            onClick={() => setMobileOpen(!mobileOpen)}
-          >
+          <button className="text-[var(--muted)] p-1" onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
       {mobileOpen && (
         <motion.div
-          initial={{ opacity: 0, y: -8 }}
+          initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.15 }}
-          className="md:hidden bg-[var(--surface)] border-b border-[var(--border)] px-6 py-3 space-y-2"
+          transition={{ duration: 0.12 }}
+          className="md:hidden border-t border-[var(--border)] px-6 py-4 space-y-3"
+          style={{ background: 'rgba(5, 5, 5, 0.95)' }}
         >
-          <Link href="/pricing" className="block text-[13px] font-medium text-[var(--text-secondary)] py-1" onClick={() => setMobileOpen(false)}>
-            Pricing
-          </Link>
-          <Link href="/blog" className="block text-[13px] font-medium text-[var(--text-secondary)] py-1" onClick={() => setMobileOpen(false)}>
-            Blog
-          </Link>
+          <Link href="/pricing" className="block text-[13px] text-[var(--muted)]" onClick={() => setMobileOpen(false)}>Pricing</Link>
+          <Link href="/blog" className="block text-[13px] text-[var(--muted)]" onClick={() => setMobileOpen(false)}>Blog</Link>
           {isSignedIn ? (
             <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
-              <button className="btn-primary text-[13px] w-full justify-center mt-1">Dashboard</button>
+              <button className="btn-primary text-[13px] w-full justify-center mt-2">Dashboard</button>
             </Link>
           ) : (
-            <div className="flex gap-2 pt-1">
+            <div className="flex gap-2 pt-2">
               <Link href="/sign-in" className="flex-1" onClick={() => setMobileOpen(false)}>
                 <button className="btn-secondary text-[13px] w-full justify-center">Sign In</button>
               </Link>
@@ -129,6 +125,6 @@ export function Navbar() {
           )}
         </motion.div>
       )}
-    </header>
+    </motion.header>
   )
 }

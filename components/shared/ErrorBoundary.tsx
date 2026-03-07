@@ -34,12 +34,12 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="flex flex-col items-center justify-center min-h-[200px] p-8 card">
           <div className="w-12 h-12 rounded-xl bg-[rgba(255,92,124,0.08)] flex items-center justify-center mb-4">
-            <AlertTriangle className="w-5 h-5 text-[var(--accent-red)]" />
+            <AlertTriangle className="w-5 h-5 text-[var(--accent)]" />
           </div>
-          <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">
+          <h3 className="text-base font-semibold text-[var(--text)] mb-1">
             We couldn&apos;t analyze this error yet
           </h3>
-          <p className="text-[13px] text-[var(--text-muted)] text-center mb-5 max-w-sm">
+          <p className="text-[13px] text-[var(--muted)] text-center mb-5 max-w-sm">
             Try adding more context or refreshing the page. If the problem persists, please contact support.
           </p>
           <button

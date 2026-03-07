@@ -1,4 +1,4 @@
-import { Check, X } from 'lucide-react'
+import { Check, Minus } from 'lucide-react'
 
 const features = [
   'Asks clarifying questions first',
@@ -20,34 +20,23 @@ const tools = [
 
 export function ComparisonTable() {
   return (
-    <section className="py-20 px-6">
+    <section className="py-[72px] px-6">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-10">
-          <h2 className="text-display text-3xl text-[var(--text-primary)] mb-3">
-            Why DebugMate?
-          </h2>
-          <p className="text-sm text-[var(--text-secondary)]">
-            See how we compare to your current debugging tools
-          </p>
+        <div className="mb-10">
+          <h2 className="text-display text-3xl text-[var(--text)] mb-2">You&apos;re already using something</h2>
+          <p className="text-[13px] text-[var(--muted)]">Here&apos;s what each option actually gives you</p>
         </div>
 
         <div className="card overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="overflow-x-auto" style={{ minWidth: '600px' }}>
+            <table className="w-full font-mono text-[13px]">
               <thead>
-                <tr className="border-b border-[var(--border)] bg-[var(--surface)]" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
-                  <th className="text-left p-3.5 text-[12px] font-medium text-[var(--text-muted)] w-1/3 uppercase tracking-wider">Feature</th>
+                <tr className="border-b border-[var(--border)]" style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--surface)' }}>
+                  <th className="text-left p-3 text-[11px] font-bold text-[var(--muted-2)] uppercase tracking-wider w-1/3">Feature</th>
                   {tools.map((tool) => (
-                    <th
-                      key={tool.name}
-                      className={`p-3.5 text-[12px] font-medium text-center uppercase tracking-wider ${
-                        tool.highlight
-                          ? 'text-[var(--accent-red)] bg-[rgba(255,92,124,0.05)]'
-                          : 'text-[var(--text-secondary)]'
-                      }`}
-                    >
+                    <th key={tool.name} className="p-3 text-[11px] font-bold text-center uppercase tracking-wider relative" style={{ color: tool.highlight ? 'var(--accent)' : 'var(--muted)' }}>
                       {tool.highlight && (
-                        <span className="block text-[10px] badge-red mb-1 mx-auto w-fit normal-case tracking-normal">Best</span>
+                        <span className="tag-bordered text-[9px] block w-fit mx-auto mb-1">BEST</span>
                       )}
                       {tool.name}
                     </th>
@@ -58,18 +47,23 @@ export function ComparisonTable() {
                 {features.map((feature, i) => (
                   <tr
                     key={feature}
-                    className="border-b border-[var(--border)] last:border-0 transition-colors duration-150 hover:bg-[var(--surface-2)]"
+                    className="border-b border-[var(--border)] last:border-0"
+                    style={{ background: i % 2 === 1 ? 'rgba(255,255,255,0.012)' : 'transparent' }}
                   >
-                    <td className="p-3.5 text-[13px] text-[var(--text-secondary)]">{feature}</td>
+                    <td className="p-3 text-[13px] text-[var(--muted)]">{feature}</td>
                     {tools.map((tool) => (
                       <td
                         key={tool.name}
-                        className={`p-3.5 text-center ${tool.highlight ? 'bg-[rgba(255,92,124,0.03)]' : ''}`}
+                        className="p-3 text-center"
+                        style={{
+                          borderLeft: tool.highlight ? '2px solid var(--accent)' : undefined,
+                          background: tool.highlight ? 'rgba(239, 68, 68, 0.03)' : undefined,
+                        }}
                       >
                         {tool.values[i] ? (
-                          <Check className="w-4 h-4 text-[var(--accent-green)] mx-auto" />
+                          <span className="text-[var(--green)] text-[13px]">✓</span>
                         ) : (
-                          <X className="w-4 h-4 text-[var(--text-muted)] opacity-40 mx-auto" />
+                          <span className="text-[var(--muted-3)] text-[13px]">—</span>
                         )}
                       </td>
                     ))}

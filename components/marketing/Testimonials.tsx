@@ -1,75 +1,81 @@
+'use client'
+
+import { motion, useInView } from 'framer-motion'
+import { useRef } from 'react'
+
 const testimonials = [
   {
-    name: 'Arjun Sharma',
+    name: 'ARJUN SHARMA',
     role: 'Junior Developer @ Razorpay',
-    avatar: 'AS',
-    quote:
-      'DebugMate didn\'t just fix my async/await bug — it explained closures in a way that finally clicked. I\'ve stopped making the same mistake.',
-    color: 'var(--accent-red)',
-    minH: '180px',
+    initials: 'AS',
+    quote: 'Had a useEffect cleanup bug that was causing a memory leak. DebugMate pointed out I was missing the return function in the effect and explained how closures retain references. Haven\'t leaked since.',
+    padding: '24px',
   },
   {
-    name: 'Priya Nair',
+    name: 'PRIYA NAIR',
     role: 'Bootcamp Student, Masai School',
-    avatar: 'PN',
-    quote:
-      'The 3 clarifying questions are genius. It feels like a senior dev is actually reviewing my code, not just spitting out a fix.',
-    color: 'var(--accent-blue)',
-    minH: '200px',
+    initials: 'PN',
+    quote: 'Honestly didn\'t think this would be better than just asking ChatGPT. But the three questions it asks before answering actually forced me to think about my own code. That\'s the part that teaches you.',
+    padding: '20px',
   },
   {
-    name: 'Rahul Gupta',
+    name: 'RAHUL GUPTA',
     role: 'Solo Founder',
-    avatar: 'RG',
-    quote:
-      'I used to spend 4 hours debugging. Now I spend 20 minutes and actually understand what went wrong. Worth every rupee.',
-    color: 'var(--accent-green)',
-    minH: '170px',
+    initials: 'RG',
+    quote: 'Spent 3 hours on a race condition in my payment webhook handler. Pasted it here, got the report in 2 minutes. The "What To Learn" card told me to study event ordering. Now I actually get it.',
+    padding: '28px',
   },
 ]
 
-export function Testimonials() {
-  return (
-    <section className="py-20 px-6 bg-[var(--surface)]">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-10">
-          <h2 className="text-display text-3xl text-[var(--text-primary)] mb-3">
-            Developers Love DebugMate
-          </h2>
-          <p className="text-sm text-[var(--text-secondary)]">
-            Join thousands of developers who debug smarter
-          </p>
-        </div>
+const easeOut = [0, 0, 0.2, 1] as const
 
-        <div className="grid md:grid-cols-3 gap-5">
-          {testimonials.map((t) => (
-            <div
+export function Testimonials() {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, amount: 0.15 })
+
+  return (
+    <section className="py-[96px] px-6" style={{ background: 'var(--surface)' }}>
+      <div className="max-w-4xl mx-auto">
+        <motion.div
+          className="mb-10"
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.4, ease: easeOut }}
+        >
+          <h2 className="text-display text-3xl text-[var(--text)] mb-2">What people said</h2>
+          <p className="text-[13px] text-[var(--muted)]">Unedited, from people who actually used it</p>
+        </motion.div>
+
+        <div ref={ref} className="grid md:grid-cols-3 gap-5 items-start">
+          {testimonials.map((t, i) => (
+            <motion.div
               key={t.name}
-              className="card p-5 flex flex-col transition-all duration-200 hover:border-[var(--border-hover)] hover:-translate-y-0.5"
-              style={{ minHeight: t.minH }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+              transition={{ duration: 0.38, delay: i * 0.1, ease: easeOut }}
+              className="card-hover"
+              style={{ padding: t.padding }}
             >
-              {/* Quote with left accent border */}
-              <div className="flex-1 mb-5 pl-3.5 border-l-2" style={{ borderColor: t.color }}>
-                <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed">
-                  &ldquo;{t.quote}&rdquo;
-                </p>
-              </div>
+              <p className="text-[14px] italic text-[var(--muted)] leading-relaxed mb-5">
+                &ldquo;{t.quote}&rdquo;
+              </p>
               <div className="flex items-center gap-2.5">
                 <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-semibold text-white flex-shrink-0"
+                  className="w-8 h-8 flex items-center justify-center text-[11px] font-bold text-[var(--accent)] flex-shrink-0"
                   style={{
-                    background: t.color,
-                    boxShadow: `0 2px 8px ${t.color}30`,
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    borderRadius: '6px',
                   }}
                 >
-                  {t.avatar}
+                  {t.initials}
                 </div>
                 <div>
-                  <p className="text-[13px] font-medium text-[var(--text-primary)]">{t.name}</p>
-                  <p className="text-[11px] text-[var(--text-muted)]">{t.role}</p>
+                  <p className="text-[12px] font-bold uppercase tracking-[0.08em] text-[var(--text)]">{t.name}</p>
+                  <p className="text-[11px] text-[var(--muted-2)]">{t.role}</p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

@@ -82,8 +82,8 @@ function StepCodeBlock({ code }: { code: string }) {
         style={{ background: '#1a1f2e', border: '1px solid var(--border)' }}
       >
         {copied
-          ? <Check className="w-3.5 h-3.5 text-[var(--accent-green)]" />
-          : <Copy className="w-3.5 h-3.5 text-[var(--text-muted)]" />}
+          ? <Check className="w-3.5 h-3.5 text-[var(--green)]" />
+          : <Copy className="w-3.5 h-3.5 text-[var(--muted-2)]" />}
       </button>
     </div>
   )
@@ -153,12 +153,12 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="card p-6 border-l-4 border-l-[var(--accent-red)]"
+        className="card p-6 border-l-4 border-l-[var(--accent)]"
       >
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-[var(--accent-red)]" />
-            <h3 className="font-display text-lg text-[var(--text-primary)]">Root Cause</h3>
+            <AlertTriangle className="w-5 h-5 text-[var(--accent)]" />
+            <h3 className="text-display text-lg text-[var(--text)]">Root Cause</h3>
           </div>
           <span className={`badge ${
             report.rootCause.severity === 'high' ? 'badge-red' :
@@ -167,8 +167,8 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
             {report.rootCause.severity} severity
           </span>
         </div>
-        <p className="text-xl font-ui text-[var(--text-primary)] mb-3">{report.rootCause.summary}</p>
-        <p className="text-[var(--text-secondary)] leading-relaxed">{report.rootCause.explanation}</p>
+        <p className="text-xl font-bold text-[var(--text)] mb-3">{report.rootCause.summary}</p>
+        <p className="text-[13px] text-[var(--muted)] leading-relaxed">{report.rootCause.explanation}</p>
       </motion.div>
 
       {/* Step-by-Step Fix */}
@@ -176,22 +176,22 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="card p-6 border-l-4 border-l-[var(--accent-green)]"
+        className="card p-6 border-l-4 border-l-[var(--green)]"
       >
         <div className="flex items-center gap-2 mb-5">
-          <CheckCircle className="w-5 h-5 text-[var(--accent-green)]" />
-          <h3 className="font-display text-lg text-[var(--text-primary)]">Step-by-Step Fix</h3>
+          <CheckCircle className="w-5 h-5 text-[var(--green)]" />
+          <h3 className="text-display text-lg text-[var(--text)]">Step-by-Step Fix</h3>
         </div>
         <div className="space-y-5">
           {report.stepByStepFix.map((step) => (
             <div key={step.step} className="flex gap-4">
               <div className="w-7 h-7 rounded-full bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-xs font-display text-[var(--accent-green)]">{step.step}</span>
+                <span className="text-xs text-display text-[var(--green)]">{step.step}</span>
               </div>
               <div className="flex-1 min-w-0 space-y-2">
-                <p className="font-ui text-sm text-[var(--text-primary)]">{step.instruction}</p>
+                <p className="font-medium text-sm text-[var(--text)]">{step.instruction}</p>
                 {step.code && <StepCodeBlock code={step.code} />}
-                <p className="text-xs text-[var(--text-muted)] italic">{step.explanation}</p>
+                <p className="text-xs text-[var(--muted-2)] italic">{step.explanation}</p>
               </div>
             </div>
           ))}
@@ -207,15 +207,15 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Code2 className="w-5 h-5 text-[var(--accent-blue)]" />
-            <h3 className="font-display text-lg text-[var(--text-primary)]">Fixed Code</h3>
+            <Code2 className="w-5 h-5 text-[var(--text)]" />
+            <h3 className="text-display text-lg text-[var(--text)]">Fixed Code</h3>
           </div>
           <div className="flex gap-2">
             <button
               onClick={handleCopyFixed}
               className="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5"
             >
-              {copiedFixed ? <Check className="w-3.5 h-3.5 text-[var(--accent-green)]" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedFixed ? <Check className="w-3.5 h-3.5 text-[var(--green)]" /> : <Copy className="w-3.5 h-3.5" />}
               {copiedFixed ? 'Copied!' : 'Copy'}
             </button>
             <button
@@ -236,7 +236,7 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <WhatToLearnCard whatToLearn={report.whatToLearn} />
+        <WhatToLearnCard whatToLearn={report.whatToLearn} language={report.errorCategory} bugContext={report.rootCause.summary} />
       </motion.div>
 
       {/* Similar Bugs */}
@@ -244,21 +244,26 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="card p-6 border-l-4 border-l-[var(--accent-yellow)]"
+        className="card p-6 border-l-4 border-l-[#eab308]"
       >
         <div className="flex items-center gap-2 mb-5">
-          <Lightbulb className="w-5 h-5 text-[var(--accent-yellow)]" />
-          <h3 className="font-display text-lg text-[var(--text-primary)]">Similar Bugs to Watch</h3>
+          <Lightbulb className="w-5 h-5 text-[#eab308]" />
+          <h3 className="text-display text-lg text-[var(--text)]">Similar Bugs to Watch</h3>
         </div>
         <div className="space-y-4">
           {report.similarBugs.map((bug, i) => (
-            <div key={i} className="p-4 bg-[var(--surface-2)] rounded-btn border border-[var(--border)]">
-              <p className="font-ui text-sm text-[var(--accent-yellow)] mb-1">{bug.pattern}</p>
-              <p className="text-xs text-[var(--text-secondary)] mb-2">{bug.example}</p>
-              <p className="text-xs text-[var(--text-muted)]">
-                <span className="text-[var(--accent-green)]">How to avoid: </span>
-                {bug.howToAvoid}
-              </p>
+            <div key={i} className="p-4 bg-[var(--surface-2)] rounded-lg border border-[var(--border)]">
+              <p className="font-bold text-[14px] text-[#eab308] mb-2">{bug.pattern}</p>
+              <pre
+                className="p-3 rounded-lg text-[12px] font-mono leading-relaxed overflow-x-auto mb-3"
+                style={{ background: '#0d0d15', border: '1px solid var(--border)', color: '#e2e8f0' }}
+              >
+                <code>{bug.example}</code>
+              </pre>
+              <div className="flex items-start gap-2">
+                <span className="text-[var(--green)] text-[12px] font-bold flex-shrink-0 mt-px">→ Fix:</span>
+                <p className="text-[13px] text-[var(--muted)] leading-relaxed">{bug.howToAvoid}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -271,8 +276,8 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
         transition={{ delay: 0.5 }}
         className="card p-5 flex items-start gap-3"
       >
-        <Heart className="w-5 h-5 text-[var(--accent-red)] flex-shrink-0 mt-0.5" />
-        <p className="text-[var(--text-secondary)] italic">{report.encouragement}</p>
+        <Heart className="w-5 h-5 text-[var(--accent)] flex-shrink-0 mt-0.5" />
+        <p className="text-[var(--muted)] italic text-[13px]">{report.encouragement}</p>
       </motion.div>
 
       {/* Action buttons */}

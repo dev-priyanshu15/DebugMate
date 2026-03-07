@@ -6,40 +6,19 @@ import { useRef } from 'react'
 interface FadeInProps {
   children: React.ReactNode
   delay?: number
-  direction?: 'up' | 'down' | 'left' | 'right' | 'none'
   className?: string
-  once?: boolean
 }
 
-export function FadeIn({
-  children,
-  delay = 0,
-  direction = 'up',
-  className,
-  once = true,
-}: FadeInProps) {
+export function FadeIn({ children, delay = 0, className }: FadeInProps) {
   const ref = useRef(null)
-  const isInView = useInView(ref, { once, margin: '-60px' })
-
-  const directionMap = {
-    up: { y: 16, x: 0 },
-    down: { y: -16, x: 0 },
-    left: { y: 0, x: 16 },
-    right: { y: 0, x: -16 },
-    none: { y: 0, x: 0 },
-  }
-
-  const initial = { opacity: 0, ...directionMap[direction] }
-  const animate = isInView
-    ? { opacity: 1, y: 0, x: 0 }
-    : initial
+  const isInView = useInView(ref, { once: true, amount: 0.15 })
 
   return (
     <motion.div
       ref={ref}
-      initial={initial}
-      animate={animate}
-      transition={{ duration: 0.4, delay, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+      transition={{ duration: 0.4, delay, ease: [0, 0, 0.2, 1] }}
       className={className}
     >
       {children}

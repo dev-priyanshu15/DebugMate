@@ -34,6 +34,17 @@ export default function NewDebugPage() {
     }).catch(() => {})
   }, [])
 
+  // Reset to input if persisted state is inconsistent (e.g. step=complete but no report)
+  useEffect(() => {
+    if (step === 'complete' && !report) {
+      reset()
+    } else if (step === 'clarifying' && questions.length === 0) {
+      reset()
+    } else if (step === 'generating') {
+      reset()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Clear stale errors on mount
   useEffect(() => {
     setError(null)
@@ -200,14 +211,14 @@ export default function NewDebugPage() {
             return (
               <div key={s.id} className="flex items-center gap-2">
                 <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] font-medium transition-all duration-200 ${
-                  isActive ? 'bg-[rgba(255,92,124,0.08)] text-[var(--accent-red)] border border-[rgba(255,92,124,0.2)]' :
-                  isDone ? 'text-[var(--accent-green)]' : 'text-[var(--text-muted)]'
+                  isActive ? 'bg-[rgba(239,68,68,0.08)] text-[var(--accent)] border border-[rgba(239,68,68,0.2)]' :
+                  isDone ? 'text-[var(--green)]' : 'text-[var(--muted-2)]'
                 }`}>
                   <Icon className="w-3.5 h-3.5" />
                   {s.label}
                 </div>
                 {i < steps.length - 1 && (
-                  <div className={`h-px w-8 transition-colors duration-200 ${isDone ? 'bg-[var(--accent-green)]' : 'bg-[var(--border)]'}`} />
+                  <div className={`h-px w-8 transition-colors duration-200 ${isDone ? 'bg-[var(--green)]' : 'bg-[var(--border)]'}`} />
                 )}
               </div>
             )
@@ -215,7 +226,7 @@ export default function NewDebugPage() {
         </div>
         <div className="w-full h-1 bg-[var(--surface-2)] rounded-full overflow-hidden">
           <motion.div
-            className="h-full bg-gradient-to-r from-[var(--accent-red)] to-[var(--accent-blue)] rounded-full"
+            className="h-full bg-[var(--accent)] rounded-full"
             animate={{ width: `${currentStep.progress}%` }}
             transition={{ duration: 0.4 }}
           />
@@ -231,13 +242,13 @@ export default function NewDebugPage() {
         >
           {isRecovering ? (
             <>
-              <RefreshCw className="w-3.5 h-3.5 text-[var(--accent-yellow)] animate-spin flex-shrink-0" />
-              <p className="text-[13px] text-[var(--accent-yellow)]">Restoring your debug session...</p>
+              <RefreshCw className="w-3.5 h-3.5 text-[#eab308] animate-spin flex-shrink-0" />
+              <p className="text-[13px] text-[#eab308]">Restoring your debug session...</p>
             </>
           ) : (
             <>
-              <AlertTriangle className="w-3.5 h-3.5 text-[var(--accent-yellow)] flex-shrink-0" />
-              <p className="text-[13px] text-[var(--accent-yellow)]">Session expired — restoring context...</p>
+              <AlertTriangle className="w-3.5 h-3.5 text-[#eab308] flex-shrink-0" />
+              <p className="text-[13px] text-[#eab308]">Session expired — restoring context...</p>
             </>
           )}
         </motion.div>
@@ -250,9 +261,9 @@ export default function NewDebugPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-4 p-3 bg-[rgba(255,92,124,0.06)] border border-[rgba(255,92,124,0.12)] rounded-md flex items-start gap-2.5"
         >
-          <AlertCircle className="w-3.5 h-3.5 text-[var(--accent-red)] flex-shrink-0 mt-0.5" />
+          <AlertCircle className="w-3.5 h-3.5 text-[var(--accent)] flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-[13px] text-[var(--accent-red)]">{error}</p>
+            <p className="text-[13px] text-[var(--accent)]">{error}</p>
           </div>
         </motion.div>
       )}
@@ -268,8 +279,8 @@ export default function NewDebugPage() {
             className="space-y-5"
           >
             <div>
-              <h1 className="text-display text-2xl text-[var(--text-primary)] mb-1.5">Debug Your Code</h1>
-              <p className="text-[var(--text-secondary)] text-[13px]">Paste your code and error message to get started</p>
+              <h1 className="text-display text-2xl text-[var(--text)] mb-1.5">Debug Your Code</h1>
+              <p className="text-[var(--muted)] text-[13px]">Paste your code and error message to get started</p>
             </div>
 
             <div className="card p-5">
@@ -325,8 +336,8 @@ export default function NewDebugPage() {
             exit={{ opacity: 0, y: -12 }}
           >
             <div className="mb-5">
-              <h1 className="text-display text-2xl text-[var(--text-primary)] mb-1.5">Your Debug Report</h1>
-              <p className="text-[var(--text-secondary)] text-[13px]">Here&apos;s everything you need to fix and understand your bug</p>
+              <h1 className="text-display text-2xl text-[var(--text)] mb-1.5">Your Debug Report</h1>
+              <p className="text-[var(--muted)] text-[13px]">Here&apos;s everything you need to fix and understand your bug</p>
             </div>
             <DebugReport
               report={report}

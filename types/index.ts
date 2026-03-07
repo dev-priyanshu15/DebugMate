@@ -92,6 +92,26 @@ export interface DebugReport {
     errorCategory: string
 }
 
+// ============================================================
+// LEARN & QUIZ TYPES
+// ============================================================
+
+export interface QuizQuestion {
+    id: number
+    question: string
+    options: string[]
+    correctIndex: number
+    explanation: string
+}
+
+export interface LearnContent {
+    concept: string
+    lesson: string[]       // paragraphs of teaching content
+    codeExamples: { label: string; code: string }[]
+    keyTakeaways: string[]
+    quiz: QuizQuestion[]
+}
+
 export interface DebugSession {
     id: string
     user_id: string
