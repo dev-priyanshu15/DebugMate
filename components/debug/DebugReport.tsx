@@ -244,16 +244,16 @@ export function DebugReport({ report, sessionId, onShareReport, onDebugAnother }
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="card p-6 border-l-4 border-l-[#eab308]"
+        className="card p-6 border-l-4 border-l-[var(--warning)]"
       >
         <div className="flex items-center gap-2 mb-5">
-          <Lightbulb className="w-5 h-5 text-[#eab308]" />
+          <Lightbulb className="w-5 h-5 text-[var(--warning)]" />
           <h3 className="text-display text-lg text-[var(--text)]">Similar Bugs to Watch</h3>
         </div>
         <div className="space-y-4">
           {report.similarBugs.map((bug, i) => (
             <div key={i} className="p-4 bg-[var(--surface-2)] rounded-lg border border-[var(--border)]">
-              <p className="font-bold text-[14px] text-[#eab308] mb-2">{bug.pattern}</p>
+              <p className="font-bold text-[14px] text-[var(--warning)] mb-2">{bug.pattern}</p>
               <pre
                 className="p-3 rounded-lg text-[12px] font-mono leading-relaxed overflow-x-auto mb-3"
                 style={{ background: '#0d0d15', border: '1px solid var(--border)', color: '#e2e8f0' }}

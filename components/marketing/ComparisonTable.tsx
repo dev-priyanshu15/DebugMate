@@ -29,7 +29,7 @@ export function ComparisonTable() {
 
         <div className="card overflow-hidden">
           <div className="overflow-x-auto" style={{ minWidth: '600px' }}>
-            <table className="w-full font-mono text-[13px]">
+            <table className="w-full text-[13px]">
               <thead>
                 <tr className="border-b border-[var(--border)]" style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--surface)' }}>
                   <th className="text-left p-3 text-[11px] font-bold text-[var(--muted-2)] uppercase tracking-wider w-1/3">Feature</th>
@@ -57,7 +57,7 @@ export function ComparisonTable() {
                         className="p-3 text-center"
                         style={{
                           borderLeft: tool.highlight ? '2px solid var(--accent)' : undefined,
-                          background: tool.highlight ? 'rgba(239, 68, 68, 0.03)' : undefined,
+                          background: tool.highlight ? 'rgba(56, 189, 248, 0.03)' : undefined,
                         }}
                       >
                         {tool.values[i] ? (

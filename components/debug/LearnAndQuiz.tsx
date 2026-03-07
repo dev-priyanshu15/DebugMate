@@ -74,7 +74,7 @@ function QuizSection({ questions, onComplete }: { questions: QuizQuestion[]; onC
               bg = 'rgba(34, 197, 94, 0.06)'
             } else if (i === selected && !isCorrect) {
               borderColor = 'var(--accent)'
-              bg = 'rgba(239, 68, 68, 0.06)'
+              bg = 'var(--accent-dim)'
             }
           } else if (i === selected) {
             borderColor = 'var(--accent)'

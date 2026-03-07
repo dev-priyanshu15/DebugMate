@@ -242,13 +242,13 @@ export default function NewDebugPage() {
         >
           {isRecovering ? (
             <>
-              <RefreshCw className="w-3.5 h-3.5 text-[#eab308] animate-spin flex-shrink-0" />
-              <p className="text-[13px] text-[#eab308]">Restoring your debug session...</p>
+              <RefreshCw className="w-3.5 h-3.5 text-[var(--warning)] animate-spin flex-shrink-0" />
+              <p className="text-[13px] text-[var(--warning)]">Restoring your debug session...</p>
             </>
           ) : (
             <>
-              <AlertTriangle className="w-3.5 h-3.5 text-[#eab308] flex-shrink-0" />
-              <p className="text-[13px] text-[#eab308]">Session expired — restoring context...</p>
+              <AlertTriangle className="w-3.5 h-3.5 text-[var(--warning)] flex-shrink-0" />
+              <p className="text-[13px] text-[var(--warning)]">Session expired — restoring context...</p>
             </>
           )}
         </motion.div>

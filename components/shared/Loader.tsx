@@ -38,7 +38,7 @@ export function Loader({ onComplete }: { onComplete: () => void }) {
     <div
       className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
       style={{
-        background: '#000000',
+        background: '#050810',
         transition: 'opacity 400ms ease',
         opacity: fading ? 0 : 1,
       }}
@@ -49,10 +49,14 @@ export function Loader({ onComplete }: { onComplete: () => void }) {
       >
         DEBUGMATE
       </div>
-      <div className="relative" style={{ width: 'min(340px, 80vw)', height: '2px', background: '#1a1a1a' }}>
+      <div className="relative" style={{ width: 'min(340px, 80vw)', height: '2px', background: '#1c2540' }}>
         <div
-          className="absolute inset-y-0 left-0 bg-[var(--accent)]"
-          style={{ animation: 'progress-fill 2.8s linear forwards' }}
+          className="absolute inset-y-0 left-0"
+          style={{
+            background: 'var(--gradient-primary)',
+            boxShadow: '0 0 14px rgba(56, 189, 248, 0.4)',
+            animation: 'progress-fill 2.8s linear forwards',
+          }}
         />
       </div>
       <p className="mt-4 text-[11px] text-[var(--muted-2)] font-mono">{status}</p>

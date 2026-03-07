@@ -105,7 +105,7 @@ export function Navbar() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.12 }}
           className="md:hidden border-t border-[var(--border)] px-6 py-4 space-y-3"
-          style={{ background: 'rgba(5, 5, 5, 0.95)' }}
+          style={{ background: 'rgba(8, 11, 20, 0.96)' }}
         >
           <Link href="/pricing" className="block text-[13px] text-[var(--muted)]" onClick={() => setMobileOpen(false)}>Pricing</Link>
           <Link href="/blog" className="block text-[13px] text-[var(--muted)]" onClick={() => setMobileOpen(false)}>Blog</Link>

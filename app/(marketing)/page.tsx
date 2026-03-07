@@ -13,9 +13,27 @@ import Link from 'next/link'
 import { ArrowRight, Plus, Minus } from 'lucide-react'
 
 const howItWorksSteps = [
-  { num: '01', title: 'Paste your broken code', description: 'Code and error message go in. No project setup, no repo linking.' },
-  { num: '02', title: 'Answer three questions', description: 'DebugMate asks what it needs to narrow down the root cause. Not generic. Specific to your code.' },
-  { num: '03', title: 'Read the report', description: 'Root cause, fix steps, corrected code, and one concept to study so this class of bug stops recurring.' },
+  {
+    num: '01',
+    title: 'Paste your broken code',
+    description: 'Code and error message go in. No project setup, no repo linking.',
+    gradient: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.06) 100%)',
+    borderColor: 'rgba(139, 92, 246, 0.15)',
+  },
+  {
+    num: '02',
+    title: 'Answer three questions',
+    description: 'DebugMate asks what it needs to narrow down the root cause. Not generic. Specific to your code.',
+    gradient: 'linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(6, 182, 212, 0.06) 100%)',
+    borderColor: 'rgba(56, 189, 248, 0.15)',
+  },
+  {
+    num: '03',
+    title: 'Read the report',
+    description: 'Root cause, fix steps, corrected code, and one concept to study so this class of bug stops recurring.',
+    gradient: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(99, 102, 241, 0.06) 100%)',
+    borderColor: 'rgba(99, 102, 241, 0.15)',
+  },
 ]
 
 const faqs = [
@@ -25,6 +43,8 @@ const faqs = [
   { q: 'What happens at the free limit?', a: 'You get a heads-up at 8/10 sessions. After 10, you wait for next month\'s reset or upgrade to Pro. No bait-and-switch. The free tier is real.' },
   { q: 'Can I use this for a bootcamp or classroom?', a: 'Yes. The Bootcamp plan gives you 50 seats, an instructor dashboard, and student-level analytics. Email us for custom pricing if you need more seats.' },
 ]
+
+const easeOut = [0, 0, 0.2, 1] as const
 
 function FAQ() {
   const [openIdx, setOpenIdx] = useState<number | null>(null)
@@ -41,7 +61,7 @@ function FAQ() {
               {faq.q}
             </span>
             {openIdx === i ? (
-              <Minus className="w-4 h-4 text-[var(--muted-2)] flex-shrink-0 ml-4" />
+              <Minus className="w-4 h-4 text-[var(--accent)] flex-shrink-0 ml-4" />
             ) : (
               <Plus className="w-4 h-4 text-[var(--muted-2)] flex-shrink-0 ml-4" />
             )}
@@ -53,7 +73,7 @@ function FAQ() {
               opacity: openIdx === i ? 1 : 0,
             }}
           >
-            <p className="text-[13px] text-[var(--muted)] leading-relaxed pb-5">{faq.a}</p>
+            <p className="text-[14px] text-[var(--muted)] leading-relaxed pb-5">{faq.a}</p>
           </div>
         </div>
       ))}
@@ -78,11 +98,10 @@ export default function LandingPage() {
             <FadeIn>
               <div className="mb-10">
                 <h2 className="text-display text-3xl text-[var(--text)] mb-2">The debug flow</h2>
-                <p className="text-[13px] text-[var(--muted)]">What happens when you paste your code in</p>
+                <p className="text-[15px] text-[var(--muted)]">What happens when you paste your code in</p>
               </div>
             </FadeIn>
 
-            {/* Steps with dashed connector and irregular grid */}
             <FadeIn>
               <div className="relative">
                 {/* Dashed connector line */}
@@ -95,19 +114,23 @@ export default function LandingPage() {
                       initial={{ opacity: 0, y: 14 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, amount: 0.15 }}
-                      transition={{ delay: i * 0.08, duration: 0.4, ease: [0, 0, 0.2, 1] }}
-                      className="card-hover relative p-5"
-                      style={{ overflow: 'hidden' }}
+                      transition={{ delay: i * 0.08, duration: 0.4, ease: easeOut }}
+                      className="relative p-6 rounded-2xl backdrop-blur-sm"
+                      style={{
+                        background: step.gradient,
+                        border: `1px solid ${step.borderColor}`,
+                        overflow: 'hidden',
+                      }}
                     >
                       {/* Faint numeral behind */}
-                      <span className="absolute top-2 right-3 text-[64px] font-bold text-[var(--text)] select-none pointer-events-none" style={{ opacity: 0.035, lineHeight: 1 }}>
+                      <span className="absolute top-2 right-3 text-[64px] font-bold text-[var(--text)] select-none pointer-events-none" style={{ opacity: 0.04, lineHeight: 1 }}>
                         {step.num}
                       </span>
 
                       <div className="relative z-10">
-                        <span className="text-[11px] font-bold text-[var(--accent)] uppercase tracking-wider mb-3 block">{step.num}</span>
-                        <h3 className="font-bold text-[15px] text-[var(--text)] mb-1.5">{step.title}</h3>
-                        <p className="text-[13px] text-[var(--muted)] leading-relaxed">{step.description}</p>
+                        <span className="text-[11px] font-semibold text-[var(--accent)] uppercase tracking-wider mb-3 block">{step.num}</span>
+                        <h3 className="font-semibold text-[16px] text-[var(--text)] mb-2">{step.title}</h3>
+                        <p className="text-[14px] text-[var(--muted)] leading-relaxed">{step.description}</p>
                       </div>
                     </motion.div>
                   ))}
@@ -117,8 +140,20 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Comparison — glass wrapper */}
         <FadeIn>
-          <ComparisonTable />
+          <div className="max-w-4xl mx-auto px-6">
+            <div
+              className="rounded-2xl p-[1px] overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(99, 102, 241, 0.08) 50%, rgba(6, 182, 212, 0.1) 100%)',
+              }}
+            >
+              <div style={{ background: 'var(--surface)', borderRadius: '15px' }}>
+                <ComparisonTable />
+              </div>
+            </div>
+          </div>
         </FadeIn>
 
         <FadeIn>
@@ -133,7 +168,7 @@ export default function LandingPage() {
         <section className="py-[64px] px-6">
           <div className="max-w-2xl mx-auto">
             <FadeIn>
-              <div className="mb-8">
+              <div className="mb-8 text-center">
                 <h2 className="text-display text-3xl text-[var(--text)] mb-2">Things people ask</h2>
               </div>
             </FadeIn>
@@ -143,34 +178,39 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Final CTA */}
+        {/* Final CTA — glass card */}
         <FadeIn>
           <section className="py-[80px] px-6">
-            <div className="max-w-lg mx-auto">
-              <h2 className="text-display text-3xl text-[var(--text)] mb-3">If you&apos;re tired of fixing bugs you don&apos;t understand</h2>
-              <p className="text-[13px] text-[var(--muted)] mb-6">Free. No card. Just paste your code.</p>
-              <Link href="/sign-up">
-                <button className="btn-primary">
-                  Try it
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </Link>
+            <div className="max-w-lg mx-auto text-center">
+              <div
+                className="rounded-2xl p-10"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.06) 0%, rgba(99, 102, 241, 0.04) 100%)',
+                  border: '1px solid rgba(56, 189, 248, 0.1)',
+                }}
+              >
+                <h2 className="text-display text-3xl text-[var(--text)] mb-3">Get started</h2>
+                <p className="text-[15px] text-[var(--muted)] mb-6">Free. No card. Just paste your code.</p>
+                <Link href="/sign-up">
+                  <button className="btn-primary">
+                    Try it
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </Link>
+              </div>
             </div>
           </section>
         </FadeIn>
 
-        {/* Footer — left aligned, not centered */}
+        {/* Footer */}
         <FadeIn>
           <footer className="border-t border-[var(--border)] py-8 px-6">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between gap-8 mb-6">
-              {/* Left: logo */}
               <div className="flex items-center gap-2">
                 <span className="font-bold text-[14px] text-[var(--text)]">DebugMate</span>
                 <span className="w-[7px] h-[7px] rounded-full bg-[var(--accent)]" />
               </div>
-
-              {/* Right: link columns */}
               <div className="flex gap-10">
                 <div className="space-y-2">
                   <Link href="/pricing" className="block text-[13px] text-[var(--muted)] hover:text-[var(--text)] transition-colors duration-150">Pricing</Link>
@@ -182,7 +222,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col md:flex-row justify-between text-[11px] font-mono text-[var(--muted-2)]">
+            <div className="flex flex-col md:flex-row justify-between text-[11px] text-[var(--muted-2)]">
               <span>© 2026 DebugMate. All rights reserved.</span>
               <span>Built by Priyanshu</span>
             </div>

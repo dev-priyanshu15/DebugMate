@@ -6,16 +6,16 @@ import { ArrowRight, Play } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 const codeLines = [
-  { text: 'async function fetchUser(id) {', tokens: [{ text: 'async function', cls: 'text-[#c084fc]' }, { text: ' fetchUser(id) {', cls: 'text-[#e2e8f0]' }] },
-  { text: '  const user = await db.find(id)', tokens: [{ text: '  const ', cls: 'text-[#c084fc]' }, { text: 'user = ', cls: 'text-[#e2e8f0]' }, { text: 'await ', cls: 'text-[#c084fc]' }, { text: 'db.find(id)', cls: 'text-[#e2e8f0]' }] },
-  { text: '  return user.name', tokens: [{ text: '  return ', cls: 'text-[#c084fc]' }, { text: 'user.name', cls: 'text-[#e2e8f0]' }] },
-  { text: '}', tokens: [{ text: '}', cls: 'text-[#e2e8f0]' }] },
+  { text: 'async function fetchUser(id) {', tokens: [{ text: 'async function', cls: 'text-[#7dd3fc]' }, { text: ' fetchUser(id) {', cls: 'text-[#e4e8f0]' }] },
+  { text: '  const user = await db.find(id)', tokens: [{ text: '  const ', cls: 'text-[#7dd3fc]' }, { text: 'user = ', cls: 'text-[#e4e8f0]' }, { text: 'await ', cls: 'text-[#7dd3fc]' }, { text: 'db.find(id)', cls: 'text-[#e4e8f0]' }] },
+  { text: '  return user.name', tokens: [{ text: '  return ', cls: 'text-[#7dd3fc]' }, { text: 'user.name', cls: 'text-[#e4e8f0]' }] },
+  { text: '}', tokens: [{ text: '}', cls: 'text-[#e4e8f0]' }] },
 ]
 
 const headingLines = [
-  { text: 'Not Just', opacity: 0.4, delay: 0.08 },
-  { text: 'The Fix.', opacity: 1.0, color: 'var(--text)', delay: 0.16 },
-  { text: 'The Understanding.', opacity: 0.8, color: 'var(--accent)', delay: 0.24 },
+  { text: 'Not Just', color: 'var(--muted-2)', delay: 0.1 },
+  { text: 'The Fix.', color: 'var(--text)', delay: 0.18 },
+  { text: 'The Understanding.', color: 'var(--accent-light)', delay: 0.26 },
 ]
 
 const easeOut = [0, 0, 0.2, 1] as const
@@ -53,7 +53,7 @@ function TypingCode() {
   return (
     <div
       className="text-[13px] leading-[1.55] p-4 rounded-lg"
-      style={{ fontFamily: "'JetBrains Mono', monospace", background: '#0d0d15', border: '1px solid var(--border)' }}
+      style={{ fontFamily: "'JetBrains Mono', monospace", background: 'var(--code-bg)', border: '1px solid var(--border)' }}
     >
       {codeLines.map((line, i) => {
         if (i > lineIdx) return null
@@ -88,7 +88,17 @@ function TypingCode() {
 export function Hero() {
   return (
     <section className="relative min-h-[90vh] flex items-center pt-[72px] pb-12 overflow-hidden">
-      <div className="max-w-6xl mx-auto px-6 w-full">
+      {/* Hero radial glow — subtle teal */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: '10%', left: '5%', width: '60%', height: '80%',
+          background: 'radial-gradient(ellipse 60% 40% at 30% 50%, rgba(56,189,248,0.06) 0%, transparent 70%)',
+          animation: 'hero-glow 8s ease-in-out infinite',
+        }}
+      />
+
+      <div className="max-w-6xl mx-auto px-6 w-full relative">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-center">
           {/* Left: Text */}
           <div className="min-w-0">
@@ -97,32 +107,30 @@ export function Hero() {
                 <motion.span
                   key={line.text}
                   className="block text-display"
-                  style={{ color: line.color || 'var(--text)' }}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: line.opacity, y: 0 }}
-                  transition={{ duration: 0.4, delay: line.delay, ease: easeOut }}
+                  style={{ color: line.color }}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: line.delay, ease: easeOut }}
                 >
                   {line.text}
                 </motion.span>
               ))}
             </h1>
 
-            {/* Subtext — delay: 320ms */}
             <motion.p
               className="text-[var(--muted)] text-[14px] leading-relaxed mt-6 mb-8 max-w-[460px]"
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.32, ease: easeOut }}
+              transition={{ duration: 0.45, delay: 0.35, ease: easeOut }}
             >
               You fixed the bug. But you don&apos;t know why it happened. Next month, same class of error, different codebase, same confusion. DebugMate breaks that loop.
             </motion.p>
 
-            {/* CTAs — delay: 400ms, no movement, just fade */}
             <motion.div
               className="flex flex-wrap gap-3"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.3, delay: 0.4, ease: easeOut }}
+              transition={{ duration: 0.4, delay: 0.42, ease: easeOut }}
             >
               <Link href="/sign-up">
                 <button className="btn-primary">
@@ -138,25 +146,23 @@ export function Hero() {
               </Link>
             </motion.div>
 
-            {/* Fine print — delay: 460ms */}
             <motion.p
               className="text-[11px] text-[var(--muted-2)] mt-4 uppercase tracking-wider"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.3, delay: 0.46, ease: easeOut }}
+              transition={{ duration: 0.35, delay: 0.48, ease: easeOut }}
             >
               free, no card, 10 sessions/mo
             </motion.p>
           </div>
 
-          {/* Right: Code card — delay: 200ms, from right */}
+          {/* Right: Code card */}
           <motion.div
-            initial={{ opacity: 0, x: 16 }}
+            initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2, ease: easeOut }}
+            transition={{ duration: 0.55, delay: 0.2, ease: easeOut }}
           >
-            <div className="card p-0 overflow-hidden" style={{ borderColor: 'var(--border-hover)', borderRadius: '12px' }}>
-              {/* Window chrome */}
+            <div className="card p-0 overflow-hidden" style={{ borderColor: 'var(--border)', borderRadius: '12px' }}>
               <div className="flex items-center gap-[6px] px-4 py-3" style={{ background: 'var(--surface-2)' }}>
                 <div className="w-[10px] h-[10px] rounded-full" style={{ background: '#ff5f56' }} />
                 <div className="w-[10px] h-[10px] rounded-full" style={{ background: '#ffbd2e' }} />
@@ -167,26 +173,24 @@ export function Hero() {
               <div className="p-4 space-y-2.5">
                 <TypingCode />
 
-                {/* Error */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 3, duration: 0.3, ease: easeOut }}
                   className="p-3 border border-[var(--border)] rounded-lg"
-                  style={{ background: 'rgba(239, 68, 68, 0.04)' }}
+                  style={{ background: 'rgba(248, 113, 113, 0.04)' }}
                 >
-                  <p className="text-[12px] font-mono" style={{ color: '#f87171' }}>
+                  <p className="text-[12px] font-mono" style={{ color: 'var(--error)' }}>
                     TypeError: Cannot read properties of null (reading &apos;name&apos;)
                   </p>
                 </motion.div>
 
-                {/* Root cause */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 3.8, duration: 0.3, ease: easeOut }}
                   className="p-3 border border-[var(--border)] rounded-lg"
-                  style={{ background: 'rgba(34, 197, 94, 0.03)' }}
+                  style={{ background: 'rgba(45, 212, 191, 0.04)' }}
                 >
                   <p className="text-[12px] font-mono text-[var(--green)] mb-0.5">✓ Root Cause Found</p>
                   <p className="text-[12px] text-[var(--muted)] leading-relaxed">
@@ -198,7 +202,7 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Stats — stagger 60ms each, start delay 500ms */}
+        {/* Stats */}
         <div className="flex flex-wrap gap-x-12 gap-y-4 mt-20 pt-8 border-t border-[var(--border)]">
           {[
             { value: '4.2h', label: 'AVG WORKDAY LOST TO DEBUGGING' },
@@ -210,9 +214,9 @@ export function Hero() {
               key={stat.label}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.5 + i * 0.06, ease: easeOut }}
+              transition={{ duration: 0.4, delay: 0.55 + i * 0.07, ease: easeOut }}
             >
-              <p className="text-[28px] font-bold font-mono text-[var(--text)]">{stat.value}</p>
+              <p className="text-[28px] font-bold text-[var(--text)]">{stat.value}</p>
               <p className="text-[11px] text-[var(--muted-2)] uppercase tracking-wider mt-0.5">{stat.label}</p>
             </motion.div>
           ))}
